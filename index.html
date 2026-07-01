@@ -3,283 +3,290 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Rifa a Beneficio 🌸</title>
+  <title>Rifa a Beneficio de Ana Quintero 🌸</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --primary: #E11D48;
-      --primary-light: #FB7185;
+      --primary: #E11D48; /* Rojo Vibrante */
+      --primary-light: #FB7185; /* Rosado */
       --primary-dark: #BE123C;
-      --bg: #FFF5F7;
+      --bg: #FFF5F7; /* Blanco Rosado muy suave */
       --surface: #FFFFFF;
       --surface2: #FFE4E6;
+      --text: #1F2937;
+      --text-muted: #4B5563;
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { font-family: 'Nunito', sans-serif; background: var(--bg); min-height: 100vh; overflow-x: hidden; }
+    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body {
+      font-family:'Nunito',sans-serif;
+      background:var(--bg); color:var(--text);
+      min-height:100vh; overflow-x:hidden;
+    }
     
+    /* Decoración de Flores */
+    .floral-deco { position: fixed; font-size: 28px; opacity: 0.8; z-index: 0; pointer-events: none; }
+    .f-1 { top: 15px; left: 15px; }
+    .f-2 { top: 40px; right: 20px; font-size: 35px; }
+    .f-3 { bottom: 80px; left: 20px; }
+    .f-4 { bottom: 30px; right: 15px; }
+
+    .content { position:relative; z-index:1; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* TICKETS */
-    .ticket-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
-    @media(min-width:400px){ .ticket-grid { grid-template-columns: repeat(10, 1fr); gap: 6px; } }
+    /* ══ ESTILOS TICKET GRID (BLANCO, NEGRO, SOLIDO) ══ */
+    .ticket-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; }
+    @media(min-width:400px){ .ticket-grid{ grid-template-columns:repeat(10,1fr); gap:6px; } }
     .ticket {
-      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-      border-radius: 8px; font-size: 14px; font-weight: 900; cursor: pointer;
-      transition: transform .15s; user-select: none; position: relative;
+      aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+      border-radius:8px; font-size:14px; font-weight:900; cursor:pointer;
+      transition:transform .15s, box-shadow .15s;
+      user-select:none; position:relative; overflow:hidden;
     }
-    .ticket-available { background: #FFFFFF; border: 2px solid #000000; color: #000000; }
+    
+    /* BOLETO DISPONIBLE - Exactamente como lo pediste */
+    .ticket-available {
+      background: #FFFFFF !important;
+      border: 2px solid #000000 !important;
+      color: #000000 !important;
+      box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+    }
+    .ticket-available:active { transform:scale(.9); }
+    
+    /* BOLETO SELECCIONADO */
     .ticket-selected {
       background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-      border: 2px solid #9F1239; color: #FFFFFF; transform: scale(1.05);
+      border: 2px solid #9F1239 !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 15px rgba(225,29,72,.4); transform:scale(1.05);
     }
-    .ticket-selected::after { content: '✓'; position: absolute; top: 2px; right: 3px; font-size: 10px; color: white; }
+    .ticket-selected::after { content:'✓'; position:absolute; top:2px; right:3px; font-size:10px; opacity:1; color:white; }
 
-    /* INPUTS Y BOTONES */
-    .form-input {
-      background: #FFFFFF; border: 2px solid #FECDD3; border-radius: 12px;
-      color: #1F2937; outline: none; width: 100%; padding: 12px; font-weight: 700;
+    /* ══ INPUTS ══ */
+    .search-input, .form-input {
+      background:#FFFFFF; border:2px solid #FECDD3;
+      border-radius:12px; color:#1F2937; outline:none; transition:border-color .2s; width: 100%;
+      padding:12px; font-weight:700;
     }
-    .form-input:focus { border-color: var(--primary); }
+    .search-input:focus, .form-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(225,29,72,.1); }
+    .search-input::placeholder, .form-input::placeholder { color:#9CA3AF; }
+
+    /* ══ BUTTONS ══ */
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-      border: none; color: #fff; font-weight: 900; border-radius: 14px; cursor: pointer;
-      box-shadow: 0 4px 20px rgba(225,29,72,.3); transition: transform .15s;
+      background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+      border:none; color:#fff; font-weight:900; border-radius:14px; cursor:pointer;
+      transition:transform .15s; box-shadow:0 4px 20px rgba(225,29,72,.3);
     }
-    .btn-primary:active { transform: scale(.97); }
+    .btn-primary:active { transform:scale(.97); }
+    .btn-outline {
+      background:#FFFFFF; border:2px solid var(--primary-light);
+      color:var(--primary-dark); font-weight:800; border-radius:14px; cursor:pointer;
+    }
 
-    /* MODALES Y BARRA FLOTANTE */
+    /* ══ FLOATING BAR ══ */
     .floating-bar {
-      position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,.95);
-      border-top: 2px solid #FECDD3; backdrop-filter: blur(20px); z-index: 100;
-      padding-bottom: env(safe-area-inset-bottom);
+      position:fixed; bottom:0; left:0; right:0;
+      background:rgba(255,255,255,.95); border-top:2px solid #FECDD3;
+      backdrop-filter:blur(20px); z-index:100; padding-bottom:env(safe-area-inset-bottom);
     }
+
+    /* ══ MODALS ══ */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
-      z-index: 200; display: flex; align-items: flex-end;
+      position:fixed; inset:0; background:rgba(0,0,0,.6);
+      backdrop-filter:blur(4px); z-index:200; display:flex; align-items:flex-end;
     }
     .modal-sheet {
-      width: 100%; background: var(--bg); border-top-left-radius: 28px;
-      border-top-right-radius: 28px; max-height: 92vh; overflow-y: auto; padding: 20px;
+      width:100%; background:var(--bg); border-top-left-radius:28px; border-top-right-radius:28px;
+      max-height:92vh; overflow-y:auto; padding: 20px;
+    }
+    .modal-center {
+      position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:400;
+      display:flex; align-items:center; justify-content:center; padding:16px;
+    }
+    .modal-card { background:#FFFFFF; border-radius:24px; width:100%; max-width:440px; padding: 20px; }
+
+    /* Chips */
+    .selected-chip {
+      background:var(--surface2); border:1px solid var(--primary-light);
+      border-radius:8px; padding:4px 10px; font-size:14px; font-weight:900; color:var(--primary-dark);
     }
   </style>
 </head>
 <body>
 
-  <!-- Contenedores ocultos de prevención para que app.js no arroje error si busca el top 10 -->
-  <div id="top10List" style="display:none;"></div>
-  <div id="buyersList" style="display:none;"></div>
+<div class="floral-deco f-1">🌸</div>
+<div class="floral-deco f-2">🌺</div>
+<div class="floral-deco f-3">🌸</div>
+<div class="floral-deco f-4">🌺</div>
 
-  <div class="content relative z-10">
-    <!-- FLYER DINÁMICO (Se carga desde Supabase, app.js lo maneja o usa este fallback) -->
-    <div class="w-full bg-white shadow-sm">
-      <img id="imgFlyer" src="https://via.placeholder.com/600x400?text=Cargando+Flyer..." class="w-full object-cover max-h-[460px] mx-auto" alt="Flyer Sorteo" />
-    </div>
-
-    <!-- CONTENEDOR PRINCIPAL -->
-    <div class="max-w-xl mx-auto px-4 pt-4 pb-32">
-      
-      <!-- ESTADÍSTICAS -->
-      <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm mb-4">
-        <div class="flex justify-between text-xs font-black uppercase text-gray-500 mb-1">
-          <span>Progreso</span>
-          <span id="salesPct" class="text-rose-600">0%</span>
-        </div>
-        <div class="w-full bg-rose-50 h-3 rounded-full overflow-hidden border border-rose-100">
-          <div id="salesFill" class="bg-gradient-to-r from-rose-500 to-pink-400 h-full" style="width: 0%"></div>
-        </div>
-        <div class="grid grid-cols-3 gap-2 mt-3 text-center">
-          <div class="bg-rose-50/50 rounded-xl p-2 border border-rose-100/50">
-            <div class="text-[10px] uppercase font-bold text-gray-400">Precio</div>
-            <div class="text-base font-black text-gray-900"><span id="statPrecio">0</span>$</div>
+<div class="content">
+  <div class="carousel-wrapper relative w-full overflow-hidden bg-white shadow-sm" id="headerCarousel">
+    <div id="mainCarousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar">
+      <div class="min-w-full snap-center relative">
+        <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover" alt="Sorteo Actual">
+        <div class="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent flex flex-col justify-end p-4 pb-8">
+          
+          <div class="flex items-center gap-2 mb-2">
+            <span class="bg-red-500 rounded-full w-3 h-3 animate-pulse"></span>
+            <span class="text-xs font-black text-red-600 tracking-widest uppercase">GRAN RIFA</span>
           </div>
-          <div class="bg-rose-50/50 rounded-xl p-2 border border-rose-100/50">
-            <div class="text-[10px] uppercase font-bold text-gray-400">Vendidos</div>
-            <div class="text-base font-black text-rose-600" id="salesSold">0</div>
+
+          <h2 id="activeMsgText" class="text-2xl font-black text-gray-900 mb-3">Rifa a Beneficio de Ana Quintero 🌸</h2>
+          
+          <div class="w-full mb-4 bg-white/90 backdrop-blur-md border border-pink-200 p-3 rounded-xl shadow-md">
+             <div class="flex justify-between items-center mb-1">
+               <span class="text-xs text-gray-600 font-bold">Progreso de Ventas</span>
+               <span class="text-xs font-black text-red-500" id="salesPct">0%</span>
+             </div>
+             <div class="bg-gray-200 h-3 rounded-full overflow-hidden mb-1">
+               <div class="bg-gradient-to-r from-pink-400 to-red-500 h-full transition-all duration-700" id="salesFill" style="width:0%"></div>
+             </div>
+             <div class="flex justify-between">
+               <span class="text-[10px] font-black text-red-600" id="salesSold">0</span>
+               <span class="text-[10px] text-gray-500"><span id="salesRem">100</span> restantes</span>
+             </div>
           </div>
-          <div class="bg-rose-50/50 rounded-xl p-2 border border-rose-100/50">
-            <div class="text-[10px] uppercase font-bold text-gray-400">Disponibles</div>
-            <div class="text-base font-black text-emerald-600" id="salesRem">0</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- BUSCAR TICKETS -->
-      <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm mb-4">
-        <h3 class="text-sm font-black text-gray-800 mb-2">🔍 ¿Ya compraste? Revisa tus números</h3>
-        <div class="flex gap-2">
-          <input type="text" id="inCedulaSearch" class="form-input !py-2" placeholder="Cédula de Identidad" />
-          <button id="btnBuscarCedula" class="btn-primary px-5 shrink-0">Buscar</button>
-        </div>
-        <div id="cedulaResults" class="mt-3 space-y-2"></div>
-      </div>
-
-      <!-- NUEVO BOTÓN: VER PREMIO (Reemplaza al Top 10) -->
-      <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm mb-4">
-        <button onclick="openPremiosModal()" class="w-full bg-gradient-to-r from-amber-500 to-orange-400 text-white font-black py-3 rounded-xl shadow-md transition transform active:scale-[0.98] flex items-center justify-center gap-2">
-          <span class="text-xl">🎁</span> Ver Premio
-        </button>
-      </div>
-
-      <!-- SECCIÓN DEL JUEGO -->
-      <div id="mainTicketSection" class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm mb-4">
-        <div class="flex justify-between items-center mb-3">
-          <h2 class="text-base font-black text-gray-900">🎟️ Elige tus números</h2>
-          <span class="text-xs bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-md">Mínimo: <span id="statMin">1</span></span>
-        </div>
-
-        <div class="bg-rose-50/50 border border-rose-100 p-3 rounded-xl mb-4 flex items-center justify-between gap-3">
-          <div class="text-xs font-bold text-gray-600">¿Suerte rápida? Al azar:</div>
-          <div class="flex items-center gap-2">
-            <div class="flex items-center bg-white border border-rose-200 rounded-lg overflow-hidden">
-              <button id="btnRestarAzar" class="px-2.5 py-1 text-gray-500 font-black">-</button>
-              <div id="displayCantidadAzar" class="px-3 font-black text-sm text-gray-800">2</div>
-              <button id="btnSumarAzar" class="px-2.5 py-1 text-gray-500 font-black">+</button>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="comenzarCompra()" class="bg-gradient-to-r from-red-600 to-pink-500 text-white font-black py-3 rounded-xl shadow-lg transform transition active:scale-95 text-sm">💳 COMPRAR NÚMEROS</button>
+            <div class="flex flex-col gap-2">
+               <button onclick="openVerifyModal()" class="bg-white border border-gray-300 text-gray-800 font-bold py-1.5 rounded-lg text-xs active:bg-gray-50">🔍 Mis Tickets</button>
             </div>
-            <!-- app.js asume que existe la función randomSelect o id btnRandom -->
-            <button id="btnRandom" onclick="if(typeof randomSelect === 'function') randomSelect()" class="bg-gray-900 text-white font-black text-xs px-3 py-2 rounded-lg">🎲 Jugar</button>
           </div>
         </div>
-
-        <!-- CUADRÍCULA DE TICKETS (app.js inyectará los números aquí) -->
-        <div id="ticketGrid" class="ticket-grid"></div>
       </div>
     </div>
   </div>
 
-  <!-- BARRA FLOTANTE DE RESERVA -->
-  <div id="floatingBar" class="floating-bar translate-y-full transition-transform duration-300">
-    <div class="max-w-xl mx-auto p-4 flex items-center justify-between gap-4">
-      <div>
-        <div class="text-xs text-gray-400 font-bold uppercase">Números elegidos</div>
-        <div id="floatingCount" class="text-xl font-black text-rose-600">0 Seleccionados</div>
+  <main id="mainTicketSection" class="px-3 pt-4 pb-36" style="display:none;">
+    <div class="grid grid-cols-3 gap-2 mb-4">
+      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
+        <div class="text-xs text-gray-500">Precio</div>
+        <div class="text-sm font-black text-red-600">Bs. <span id="statPrecio">5</span></div>
       </div>
-      <button onclick="if(typeof openPayModal === 'function') openPayModal()" class="btn-primary px-8 py-3.5 text-sm font-black shrink-0">
-        Reservar →
+      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
+        <div class="text-xs text-gray-500">Mínimo</div>
+        <div class="text-sm font-black text-pink-500"><span id="statMin">2</span> tickets</div>
+      </div>
+      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
+        <div class="text-xs text-gray-500">Disponibles</div>
+        <div class="text-sm font-black text-gray-900" id="statDisp">100</div>
+      </div>
+    </div>
+
+    <div class="bg-white border border-pink-200 rounded-2xl p-4 mb-4 shadow-sm">
+      <div class="flex items-center justify-center mb-4">
+        <div class="text-sm font-black text-red-500 uppercase tracking-widest text-center">🎰 Selección Rápida</div>
+      </div>
+      <div class="flex items-center justify-center gap-4 mb-4">
+        <button id="btnRestarAzar" class="w-12 h-12 rounded-xl bg-pink-100 text-red-500 font-black text-2xl border border-pink-200 active:scale-95 flex items-center justify-center pb-1">-</button>
+        <div class="w-24 h-12 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-xl">
+          <span id="displayCantidadAzar" class="text-2xl font-black text-gray-900">2</span>
+        </div>
+        <button id="btnSumarAzar" class="w-12 h-12 rounded-xl bg-pink-100 text-red-500 font-black text-2xl border border-pink-200 active:scale-95 flex items-center justify-center pb-1">+</button>
+      </div>
+      <button onclick="randomSelect()" class="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white font-black py-3 rounded-xl shadow-md transform transition active:scale-95 text-sm flex items-center justify-center gap-2">
+        🎲 GENERAR NÚMEROS AL AZAR
       </button>
     </div>
-  </div>
 
-  <!-- MODAL: PREMIOS DEL SORTEO (El que se abre con el botón) -->
-  <div id="premiosModal" class="modal-overlay" style="display:none;" onclick="closePremiosModal()">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">🎁 Gran Premio</h2>
-        <button onclick="closePremiosModal()" class="text-gray-400 font-bold text-lg p-1">✕</button>
-      </div>
+    <div class="flex gap-2 mb-3">
+      <input type="text" id="searchInput" class="search-input flex-1 px-4 py-3 text-lg text-center" placeholder="🔍 Buscar número (Ej: 05)" maxlength="2" inputmode="numeric" />
+    </div>
 
-      <div class="bg-white border-2 border-amber-300 rounded-2xl p-4 shadow-sm relative overflow-hidden mb-6">
-        <div class="flex gap-3 items-start mt-2">
-          <span class="text-3xl">🥇</span>
-          <div>
-            <h3 class="font-black text-gray-900 text-base">Premio Principal</h3>
-            <p class="text-sm text-gray-500 mt-2 leading-relaxed">
-              Aquí puedes describir el premio que el ganador se llevará. Recuerda que al participar estás apoyando una gran causa y además tienes la oportunidad de ganar este maravilloso premio. ¡Mucha suerte!
-            </p>
-          </div>
+    <div id="ticketGrid" class="ticket-grid mb-3"></div>
+  </main>
+
+  <div class="floating-bar px-4 py-3" id="mainFloatingBar" style="display:none;">
+    <div class="flex items-center gap-3 mb-2">
+      <div class="flex-1">
+        <div class="flex justify-between text-xs mb-1 text-gray-600 font-bold">
+          <span>Seleccionados</span>
+          <span class="font-black text-gray-900" id="countLabel">0 / <span id="minLabel">2</span></span>
         </div>
       </div>
-      <button onclick="closePremiosModal()" class="btn-primary w-full py-4 text-base">Entendido</button>
+      <div class="text-right">
+        <div class="text-xs text-gray-500 font-bold">Total a Pagar</div>
+        <div class="font-black text-red-600 text-lg" id="totalPrice">Bs. 0</div>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button onclick="clearSelection()" class="btn-outline flex-1 py-3 text-sm">🗑️ Limpiar</button>
+      <button onclick="openPayModal()" id="btnPagar" class="btn-primary flex-1 py-3 text-sm" disabled style="opacity:.4">💳 Pagar</button>
     </div>
   </div>
+</div>
 
-  <!-- MODAL: FORMULARIO DE PAGO -->
-  <div id="payModal" class="modal-overlay" style="display:none" onclick="if(typeof closePayModal === 'function') closePayModal()">
-    <div class="modal-sheet" onclick="event.stopPropagation()">
-      <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
-      
-      <div class="flex justify-between items-center mb-2">
-        <h2 class="text-xl font-black text-gray-900">Confirmar Reserva 🌸</h2>
-        <button onclick="if(typeof closePayModal === 'function') closePayModal()" class="text-gray-400 font-bold text-lg">✕</button>
-      </div>
-      
-      <div class="flex flex-wrap gap-1.5 mb-4" id="checkoutChips"></div>
-
-      <!-- DATOS DE PAGO MÓVIL ACTUALIZADOS -->
-      <div class="bg-white border border-rose-100 p-3 rounded-2xl space-y-2 mb-4 text-xs shadow-sm">
-        <div class="text-rose-800 font-bold uppercase tracking-wider text-[10px]">Datos de Pago Móvil:</div>
-        
-        <div class="flex justify-between items-center bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
-          <div><span class="text-gray-400">Banco:</span> <span class="font-black text-gray-800" id="bnc-val">BNC (0191)</span></div>
-          <button onclick="copyTxt('0191')" class="bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-md text-[10px] active:scale-95 transition">Copiar</button>
-        </div>
-
-        <div class="flex justify-between items-center bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
-          <div><span class="text-gray-400">C.I:</span> <span class="font-black text-gray-800" id="ci-val">19479080</span></div>
-          <button onclick="copyTxt('19479080')" class="bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-md text-[10px] active:scale-95 transition">Copiar</button>
-        </div>
-
-        <div class="flex justify-between items-center bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
-          <div><span class="text-gray-400">Teléfono:</span> <span class="font-black text-gray-800" id="telf-val">04269395786</span></div>
-          <button onclick="copyTxt('04269395786')" class="bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-md text-[10px] active:scale-95 transition">Copiar</button>
-        </div>
-
-        <div class="pt-1 text-center font-bold text-rose-600 text-sm">
-          Monto Total: <span id="checkoutMonto" class="text-lg font-black">0</span>$
-        </div>
-      </div>
-
-      <form id="payForm" class="space-y-3 pb-4">
-        <input type="text" id="fNombre" class="form-input" placeholder="Nombre y Apellido" required />
-        <input type="text" id="fCedula" class="form-input" placeholder="Cédula de Identidad" required />
-        <input type="tel" id="fTelefono" class="form-input" placeholder="Número de Teléfono" required />
-        <input type="text" id="fReferencia" class="form-input" placeholder="Últimos 4 dígitos de Referencia" required />
-        
-        <label class="block border-2 border-dashed border-rose-200 p-4 rounded-xl text-center cursor-pointer bg-white">
-          <span id="uploadText" class="text-sm font-bold text-gray-500">📷 Subir Capture de Pago</span>
-          <!-- ID requerido por app.js -->
-          <input type="file" id="fCapture" accept="image/*" class="hidden" required />
-        </label>
-        <img id="capturePreview" class="w-full mt-2 hidden max-h-40 object-cover rounded-xl border border-gray-200" />
-        
-        <button type="submit" class="btn-primary w-full py-4 text-base">🚀 Enviar Validación</button>
-      </form>
+<div id="termsModal" class="modal-center" style="display:none">
+  <div class="modal-card">
+    <div class="text-center mb-4">
+      <div class="text-4xl mb-2">🌸</div>
+      <h2 class="text-xl font-black text-gray-900">Ayudemos a Ana</h2>
+      <p class="text-sm text-gray-500 mt-1">Gracias por unirte a esta noble causa.</p>
     </div>
+    <button onclick="document.getElementById('mainTicketSection').style.display='block'; document.getElementById('mainFloatingBar').style.display='block'; acceptTerms();" class="btn-primary w-full py-4 text-base">✅ Participar ahora</button>
   </div>
+</div>
 
-  <div id="successModal" class="modal-overlay" style="display:none">
-    <div class="modal-sheet text-center">
-      <div class="text-6xl mb-3">🌸</div>
-      <h2 class="text-2xl font-black text-gray-900 mb-1">¡Reserva Registrada!</h2>
-      <p class="text-gray-500 text-sm mb-4">Estamos validando tu transacción.</p>
-      <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-4 text-left text-xs space-y-1" id="successSummary"></div>
+<div id="verifyModal" class="modal-overlay" style="display:none">
+  <div class="modal-sheet">
+    <h2 class="text-xl font-black text-gray-900 mb-1">🔍 Mis números</h2>
+    <p class="text-sm text-gray-500 mb-4">Ingresa tu cédula para consultar</p>
+    <div class="flex gap-2 mb-4">
+      <input id="verifyCedula" type="text" class="form-input flex-1" placeholder="Ej: 12345678" />
+      <button onclick="buscarMisBoletos()" id="btnBuscarBoletos" class="btn-primary px-5 py-3 text-sm">Buscar</button>
     </div>
+    <div id="verifyResults" class="mb-2 max-h-[40vh] overflow-y-auto"></div>
+    <button onclick="closeVerifyModal()" class="btn-outline w-full py-3 mt-1">← Cerrar</button>
   </div>
+</div>
 
-  <!-- FUNCIONES INTERNAS DE UI (Las de datos las maneja tu app.js) -->
-  <script>
-    function openPremiosModal() {
-      document.getElementById('premiosModal').style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    }
-    function closePremiosModal() {
-      document.getElementById('premiosModal').style.display = 'none';
-      document.body.style.overflow = '';
-    }
-    function copyTxt(text) {
-      navigator.clipboard.writeText(text);
-      alert("Copiado al portapapeles: " + text); // O tu función showToast() si existe en app.js
-    }
+<div id="payModal" class="modal-overlay" style="display:none">
+  <div class="modal-sheet">
+    <h2 class="text-xl font-black text-gray-900 mb-1">Confirmar Compra 🎟️</h2>
+    <div class="mb-4">
+      <div class="text-xs font-bold text-gray-500 mb-2">TUS NÚMEROS (00 al 99):</div>
+      <div id="selectedChips" class="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto"></div>
+    </div>
+    <div class="bg-pink-50 p-4 rounded-xl border border-pink-200 mb-4">
+      <div class="text-sm font-black text-red-600 mb-2">💳 PAGO MÓVIL</div>
+      <div class="space-y-1 text-sm text-gray-700">
+        <div class="flex justify-between"><span>Banco:</span><span class="font-bold">Venezuela (0102)</span></div>
+        <div class="flex justify-between"><span>C.I:</span><span class="font-bold">30.522.091</span></div>
+        <div class="flex justify-between"><span>Teléfono:</span><span class="font-bold">0414-4708220</span></div>
+        <div class="border-t border-pink-200 pt-2 mt-2 flex justify-between"><span class="font-bold">Total:</span><span class="font-black text-lg text-red-600" id="modalTotal">Bs. 0</span></div>
+      </div>
+    </div>
+    <form id="payForm" onsubmit="submitOrder(event)" class="space-y-3">
+      <input type="text" id="fNombre" class="form-input" placeholder="👤 Nombre Completo *" required />
+      <input type="text" id="fCedula" class="form-input" placeholder="🪪 Cédula *" required />
+      <input type="tel" id="fWhatsapp" class="form-input" placeholder="📱 WhatsApp *" required />
+      <input type="text" id="fRef" class="form-input text-center tracking-widest" placeholder="🔢 6 últimos dígitos ref *" required maxlength="6" minlength="6" />
+      <label class="block border-2 border-dashed border-pink-300 p-4 rounded-xl text-center cursor-pointer bg-white">
+        <span id="uploadText" class="text-sm font-bold text-gray-500">📷 Subir Capture</span>
+        <input type="file" id="fCapture" accept="image/*" class="hidden" onchange="previewCapture(this)" required />
+      </label>
+      <img id="capturePreview" class="w-full mt-2 hidden max-h-40 object-cover rounded-xl border border-gray-200" />
+      <button type="submit" class="btn-primary w-full py-4 text-base">🚀 Enviar Reserva</button>
+      <button type="button" onclick="closePayModal()" class="btn-outline w-full py-3">← Volver</button>
+    </form>
+  </div>
+</div>
 
-    // Configuración para previsualizar el capture
-    document.getElementById('fCapture').addEventListener('change', function() {
-      if (this.files && this.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const preview = document.getElementById('capturePreview');
-          preview.src = e.target.result;
-          preview.style.display = 'block';
-        }
-        reader.readAsDataURL(this.files[0]);
-      }
-    });
-  </script>
+<div id="successModal" class="modal-overlay" style="display:none">
+  <div class="modal-sheet text-center">
+    <div class="text-6xl mb-3">🌸</div>
+    <h2 class="text-2xl font-black text-gray-900 mb-1">¡Gracias por ayudar!</h2>
+    <p class="text-gray-500 text-sm mb-4">Tu reserva fue registrada y pronto será confirmada.</p>
+    <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-4 text-left" id="successSummary"></div>
+    <button onclick="goVIP()" class="btn-primary w-full py-3 text-sm mb-2">📲 Ir al grupo VIP de la Rifa</button>
+    <button onclick="closeSuccessModal()" class="btn-outline w-full py-3 text-sm">✅ Cerrar</button>
+  </div>
+</div>
 
-  <!-- TUS ARCHIVOS JS ORIGINALES (Obligatorios en este orden para que funcione Supabase) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="credentials.js"></script>
-  <script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js?v=2"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
