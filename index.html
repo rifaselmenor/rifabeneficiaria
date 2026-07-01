@@ -4,71 +4,113 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Rifa Ana — Bienvenidos 🌸</title>
+  <!-- Tailwind CSS Oficial -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  
   <style>
     :root {
       --rose: #F43F5E;
       --rose-light: #FDA4AF;
       --bg: #FFFFFF;
-      --glass: rgba(255, 255, 255, 0.6);
-      --glass-border: rgba(255, 255, 255, 0.8);
       --text: #1F2937;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       font-family: 'Nunito', sans-serif;
-      background: var(--bg); color: var(--text);
-      min-height: 100vh; position: relative;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      position: relative;
     }
+    /* Fondo estético sutil con toque floral/rosa */
     body::before {
-      content: ''; position: fixed; inset: 0;
+      content: '';
+      position: fixed;
+      inset: 0;
       background: 
-        radial-gradient(circle at 20% 20%, rgba(255, 241, 242, 0.9) 0%, transparent 60%),
-        radial-gradient(circle at 80% 80%, rgba(244, 63, 94, 0.05) 0%, transparent 60%);
-      pointer-events: none; z-index: 0;
+        radial-gradient(circle at 10% 20%, rgba(255, 241, 242, 0.9) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(244, 63, 94, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
     }
-    .content { position: relative; z-index: 1; }
+    .content-container { position: relative; z-index: 1; }
+    
+    /* Botones Estilo Premium */
     .btn-primary {
       background: linear-gradient(135deg, var(--rose) 0%, #FDA4AF 100%);
-      color: #fff; font-weight: 900; border-radius: 20px;
-      transition: transform .15s; box-shadow: 0 6px 20px rgba(244, 63, 94, 0.2);
+      color: #FFFFFF;
+      font-weight: 900;
+      border-radius: 20px;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 6px 20px rgba(244, 63, 94, 0.2);
     }
-    .btn-primary:active { transform: scale(.96); }
+    .btn-primary:active { transform: scale(.96); box-shadow: 0 3px 10px rgba(244, 63, 94, 0.15); }
     
     .btn-outline-rose {
-      background: #FFFFFF; border: 2px solid #FFE4E6;
-      color: var(--rose); font-weight: 900; border-radius: 20px;
-      transition: all .15s; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+      background: #FFFFFF;
+      border: 2px solid #FFE4E6;
+      color: var(--rose);
+      font-weight: 900;
+      border-radius: 20px;
+      transition: all .15s;
     }
     .btn-outline-rose:active { transform: scale(.96); background: #FFF1F2; }
 
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200;
-      display: flex; align-items: flex-end;
+    /* Modales Desplegables Base Inferior */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none; /* Asegura que inicia completamente oculto */
+      align-items: flex-end;
     }
     .modal-sheet {
-      width: 100%; background: #FFFFFF;
-      border-top-left-radius: 32px; border-top-right-radius: 32px;
-      max-height: 85vh; overflow-y: auto;
+      width: 100%;
+      background: #FFFFFF;
+      border-top-left-radius: 32px;
+      border-top-right-radius: 32px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 -10px 25px rgba(0,0,0,0.05);
     }
-    .copy-btn { color: var(--rose); font-size: 13px; cursor: pointer; }
+    
+    /* ESTILO LIGHTBOX HD (ESTILO CHAT WHATSAPP) */
+    .lightbox-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 300;
+      display: none; /* CORRECCIÓN: Inicia oculto para evitar bloqueos */
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .copy-icon { color: var(--rose); font-size: 13px; cursor: pointer; }
   </style>
 </head>
 <body>
-<div class="content min-h-screen flex flex-col justify-between pb-8">
 
-  <!-- HERO HEADER (FLYER REAL DE TU DISEÑO) -->
+<div class="content-container min-h-screen flex flex-col justify-between pb-8">
+
+  <!-- SECCIÓN FLYER PRINCIPAL (ASPECT RATIO DE TU DISEÑO) -->
   <div class="relative w-full bg-gray-50 border-b border-gray-100 shadow-sm">
     <img id="landingFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando+Sorteo..." class="w-full aspect-[4/5] object-cover" alt="Sorteo Ana">
-    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-6">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6">
       <div class="flex items-center gap-2 mb-1">
         <span class="bg-rose-500 rounded-full w-2.5 h-2.5 animate-pulse"></span>
         <span class="text-xs font-black text-rose-400 tracking-widest uppercase">DISPONIBLE</span>
       </div>
       <h1 id="landingMsgText" class="text-2xl font-black text-white mb-4">Cargando información...</h1>
       
-      <!-- Barra Progreso Ventas -->
+      <!-- Componente: Barra de Progreso de Ventas Dinámica -->
       <div class="w-full bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl shadow-lg">
         <div class="flex justify-between items-center mb-1.5">
           <span class="text-xs text-white font-bold">Progreso de Ventas</span>
@@ -81,7 +123,7 @@
     </div>
   </div>
 
-  <!-- SECCIÓN CENTRAL DE ACCIONES REVISADA -->
+  <!-- SECCIÓN CENTRAL DE CONTROL DE ACCIONES -->
   <div class="px-6 my-6 text-center">
     <p class="text-sm text-gray-500 font-bold mb-5 px-2">
       ¡Apóyanos y participa por maravillosos premios! Elige tus números de la suerte.
@@ -91,13 +133,13 @@
       <button onclick="openPremiosModal()" class="btn-outline-rose py-4 flex items-center justify-center gap-2 text-sm">
         🎁 Ver Premios
       </button>
-      <a href="rifas.html" class="btn-primary py-4 flex items-center justify-center gap-2 text-sm text-center">
+      <a href="rifa.html" class="btn-primary py-4 flex items-center justify-center gap-2 text-sm text-center">
         🎟️ Comprar Tickets →
       </a>
     </div>
   </div>
 
-  <!-- DATOS DE PAGO MÓVIL OFICIALES -->
+  <!-- SECCIÓN: DATOS DE PAGO MÓVIL SÍNCRONOS -->
   <div class="px-6 max-w-md mx-auto w-full">
     <div class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm border-t-4 border-t-rose-400">
       <div class="text-xs font-black text-rose-500 mb-4 tracking-wider uppercase flex items-center gap-1.5">
@@ -106,15 +148,15 @@
       <div class="space-y-3 text-sm text-gray-700 font-bold">
         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
           <span class="text-gray-400 text-xs">Banco:</span>
-          <span class="text-gray-800">BNC 0191 <span class="copy-btn ml-1" onclick="copyText('0191')">📋</span></span>
+          <span class="text-gray-800">BNC 0191 <span class="copy-icon ml-1" onclick="copyData('0191')">📋</span></span>
         </div>
         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
           <span class="text-gray-400 text-xs">C.I:</span>
-          <span class="text-gray-800">19479080 <span class="copy-btn ml-1" onclick="copyText('19479080')">📋</span></span>
+          <span class="text-gray-800">19479080 <span class="copy-icon ml-1" onclick="copyData('19479080')">📋</span></span>
         </div>
         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
           <span class="text-gray-400 text-xs">Teléfono:</span>
-          <span class="text-gray-800">04269395786 <span class="copy-btn ml-1" onclick="copyText('04269395786')">📋</span></span>
+          <span class="text-gray-800">04269395786 <span class="copy-icon ml-1" onclick="copyData('04269395786')">📋</span></span>
         </div>
       </div>
     </div>
@@ -122,8 +164,8 @@
 
 </div>
 
-<!-- MODAL DESPLEGABLE: PREMIOS DEL SORTEO -->
-<div id="premiosModal" class="modal-overlay" style="display:none">
+<!-- MODAL SHEET DESPLEGABLE: INFORMACIÓN DE PREMIOS -->
+<div id="premiosModal" class="modal-backdrop">
   <div class="modal-sheet p-6">
     <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
     
@@ -132,48 +174,35 @@
       <button onclick="closePremiosModal()" class="text-gray-400 text-xl font-bold p-1">✕</button>
     </div>
 
-    <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1" id="listaPremiosContenedor">
-      <!-- Premio 1 -->
-      <div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4">
+    <!-- Lista de Contenedores de Premios vinculados al Visor Lightbox -->
+    <div class="space-y-4 max-h-[55vh] overflow-y-auto pr-1">
+      
+      <!-- Premio 1 Card -->
+      <div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio1')">
         <div class="flex gap-4 items-center">
-          <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center text-3xl shrink-0 shadow-sm overflow-hidden">
-            <img id="imgPremio1" src="https://via.placeholder.com/150?text=Premio+1" class="w-full h-full object-cover hidden" alt="P1">
-            <span id="iconPremio1">🥇</span>
+          <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+            <img id="imgPremio1" src="https://via.placeholder.com/300x400?text=Premio+1" class="w-full h-full object-cover" alt="Premio 1">
           </div>
-          <div>
+          <div class="flex-1">
             <h3 class="font-black text-gray-900 text-base">Primer Premio</h3>
-            <p id="descPremio1" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">¡Gran Combo Sorpresa! El premio principal esperado por todos. Los detalles completos se sincronizan directamente.</p>
+            <p id="descPremio1" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Sincronizando descripción oficial del primer premio desde base de datos...</p>
           </div>
         </div>
       </div>
 
-      <!-- Premio 2 -->
-      <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4">
+      <!-- Premio 2 Card -->
+      <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio2')">
         <div class="flex gap-4 items-center">
-          <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-3xl shrink-0 shadow-sm overflow-hidden">
-            <img id="imgPremio2" src="https://via.placeholder.com/150?text=Premio+2" class="w-full h-full object-cover hidden" alt="P2">
-            <span id="iconPremio2">🥈</span>
+          <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+            <img id="imgPremio2" src="https://via.placeholder.com/300x400?text=Premio+2" class="w-full h-full object-cover" alt="Premio 2">
           </div>
-          <div>
+          <div class="flex-1">
             <h3 class="font-black text-gray-900 text-sm">Segundo Premio</h3>
-            <p id="descPremio2" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Un espectacular incentivo adicional para los colaboradores del sorteo.</p>
+            <p id="descPremio2" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Sincronizando descripción oficial del segundo premio...</p>
           </div>
         </div>
       </div>
 
-      <!-- Premio 3 -->
-      <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4">
-        <div class="flex gap-4 items-center">
-          <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-3xl shrink-0 shadow-sm overflow-hidden">
-            <img id="imgPremio3" src="https://via.placeholder.com/150?text=Premio+3" class="w-full h-full object-cover hidden" alt="P3">
-            <span id="iconPremio3">🥉</span>
-          </div>
-          <div>
-            <h3 class="font-black text-gray-900 text-sm">Tercer Premio</h3>
-            <p id="descPremio3" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Premio especial de agradecimiento por tu valioso apoyo a la causa.</p>
-          </div>
-        </div>
-      </div>
     </div>
 
     <button onclick="closePremiosModal()" class="btn-primary w-full py-4 text-xs font-black uppercase tracking-wider mt-5">
@@ -182,91 +211,84 @@
   </div>
 </div>
 
+<!-- CAPA LIGHTBOX MULTIMEDIA HD (CIERRE CON EN PANTALLA COMPLETA 3:4) -->
+<div id="lightboxOverlay" class="lightbox-backdrop" onclick="handleOutsideLightboxClick(event)">
+  <!-- Botón X con escape superior estricto -->
+  <button onclick="closeLightboxView()" class="absolute top-6 right-6 text-white text-3xl font-black bg-black/40 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm z-50">✕</button>
+  
+  <div class="w-full max-w-md px-4" onclick="event.stopPropagation()">
+    <!-- Forzado Estricto a Formato de Aspecto 3:4 -->
+    <div class="w-full aspect-[3/4] bg-neutral-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+      <img id="lightboxDisplayImg" src="" class="w-full h-full object-cover" alt="Visualización HD">
+    </div>
+  </div>
+</div>
+
+<!-- SDK DE CONEXIÓN CON SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=2"></script>
 
-  // Funciones para el visor de imágenes Lightbox HD
-function openLightbox(src) {
-  if (!src || src.includes('placeholder')) return; // Evita abrir si no hay imagen real cargada
-  document.getElementById('lightboxImg').src = src;
-  document.getElementById('lightbox').style.display = 'flex';
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').style.display = 'none';
-}
-
 <script>
-  function openPremiosModal() { document.getElementById('premiosModal').style.display = 'flex'; }
-  function closePremiosModal() { document.getElementById('premiosModal').style.display = 'none'; }
+  // Controladores del Modal de Premios
+  function openPremiosModal() {
+    document.getElementById('premiosModal').style.display = 'flex';
+  }
+  function closePremiosModal() {
+    document.getElementById('premiosModal').style.display = 'none';
+  }
   
-  function copyText(txt) {
-    navigator.clipboard.writeText(txt);
-    alert("Copiado: " + txt);
+  // Sistema Lightbox de Imagen HD Estilo Chat (Formato 3:4)
+  function triggerLightboxView(imgElementId) {
+    const targetImgSrc = document.getElementById(imgElementId).src;
+    if (!targetImgSrc || targetImgSrc.includes('placeholder')) return;
+    
+    document.getElementById('lightboxDisplayImg').src = targetImgSrc;
+    document.getElementById('lightboxOverlay').style.display = 'flex';
+  }
+  
+  function closeLightboxView() {
+    document.getElementById('lightboxOverlay').style.display = 'none';
+    document.getElementById('lightboxDisplayImg').src = ''; // Limpia memoria de renderizado
   }
 
+  function handleOutsideLightboxClick(e) {
+    closeLightboxView();
+  }
+
+  function copyData(textToCopy) {
+    navigator.clipboard.writeText(textToCopy);
+    alert("Copiado con éxito: " + textToCopy);
+  }
+
+  // Carga Síncrona Dinámica desde Base de Datos (Supabase)
   document.addEventListener('DOMContentLoaded', async () => {
     try {
+      // Consulta tabla de configuraciones del landing
       const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
       if(config) {
         if(config.flyer_url) document.getElementById('landingFlyerImg').src = config.flyer_url;
         if(config.mensaje) document.getElementById('landingMsgText').textContent = config.mensaje;
         
+        // Mapeo dinámico de URLs del bucket e información de texto
         if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
-        if(config.premio1_img) {
-          document.getElementById('imgPremio1').src = config.premio1_img;
-          document.getElementById('imgPremio1').classList.remove('hidden');
-          document.getElementById('iconPremio1').classList.add('hidden');
-        }
+        if(config.premio1_img) document.getElementById('imgPremio1').src = config.premio1_img;
+        
         if(config.premio2_desc) document.getElementById('descPremio2').textContent = config.premio2_desc;
-        if(config.premio2_img) {
-          document.getElementById('imgPremio2').src = config.premio2_img;
-          document.getElementById('imgPremio2').classList.remove('hidden');
-          document.getElementById('iconPremio2').classList.add('hidden');
-        }
-        if(config.premio3_desc) document.getElementById('descPremio3').textContent = config.premio3_desc;
-        if(config.premio3_img) {
-          document.getElementById('imgPremio3').src = config.premio3_img;
-          document.getElementById('imgPremio3').classList.remove('hidden');
-          document.getElementById('iconPremio3').classList.add('hidden');
-        }
+        if(config.premio2_img) document.getElementById('imgPremio2').src = config.premio2_img;
       }
 
+      // Cálculo en tiempo real de la barra de progreso
       const { data: tkts } = await db.from('tickets_v2').select('status');
       if(tkts) {
-        const vendidos = tkts.filter(t => t.status === 'vendido' || t.status === 'apartado').length;
-        const pct = Math.min(100, Math.round((vendidos / 100) * 100));
-        document.getElementById('salesPct').textContent = pct + '%';
-        document.getElementById('salesFill').style.width = pct + '%';
+        const reservados = tkts.filter(t => t.status === 'vendido' || t.status === 'apartado').length;
+        const porcentajeVenta = Math.min(100, Math.round((reservados / 100) * 100));
+        document.getElementById('salesPct').textContent = porcentajeVenta + '%';
+        document.getElementById('salesFill').style.width = porcentajeVenta + '%';
       }
-    } catch(e) { console.error(e); }
+    } catch(error) {
+      console.error("Error cargando configuración inicial:", error);
+    }
   });
 </script>
-  <!-- VISOR LIGHTBOX 3:4 HD (ESTILO CHAT CON X ARRIBA) -->
-<div id="lightbox" class="lightbox-overlay" style="display:none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 16px;">
-  <!-- Botón de cerrar (X) en la esquina superior -->
-  <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white text-3xl font-black bg-black/40 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm z-50">✕</button>
-  
-  <div class="w-full max-w-md">
-    <!-- Contenedor forzado a Aspect Ratio 3:4 Exacto -->
-    <div class="w-full aspect-[3/4] bg-neutral-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-      <img id="lightboxImg" src="" class="w-full h-full object-cover" alt="Imagen en Alta Definición">
-    </div>
-  </div>
-</div>
-  <!-- Ejemplo para el Premio 1 (Aplica la misma lógica a los demás) -->
-<div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4 cursor-pointer" onclick="openLightbox(document.getElementById('imgPremio1').src)">
-  <div class="flex gap-4 items-center">
-    <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center overflow-hidden shadow-inner">
-      <!-- Tu imagen actual conectada a Supabase -->
-      <img id="imgPremio1" src="URL_DE_TU_BUCKET_AQUÍ" class="w-full h-full object-cover" alt="P1">
-    </div>
-    <div class="flex-1">
-      <h3 class="font-black text-gray-900 text-base">Primer Premio</h3>
-      <p id="descPremio1" class="text-xs text-gray-500 mt-0.5 font-medium">¡Gran Combo Sorpresa! Toca la imagen para ampliar en HD.</p>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
