@@ -66,20 +66,45 @@
     }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: flex-end; }
     .modal-sheet { width: 100%; background: #FFFFFF; border-top-left-radius: 28px; border-top-right-radius: 28px; max-height: 90vh; overflow-y: auto; }
+    
+    /* MODALES DESPLEGABLES BASE INFERIOR (PREMIOS) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+    }
+
+    /* ESTILO LIGHTBOX HD (ESTILO EN CHAT / ZOOM) */
+    .lightbox-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
   </style>
 </head>
 <body>
 <div class="content">
 
-  <!-- HERO SUPERIOR REVISADO (SIN BOTÓN DUPLICADO DE COMPRAS) -->
+  <!-- HERO SUPERIOR REVISADO CON NUEVO BOTÓN VER PREMIOS -->
   <div class="relative w-full overflow-hidden bg-gray-50 border-b border-gray-100 shadow-sm">
     <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover" alt="Sorteo">
     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-4 pb-6">
       
-      <!-- Fila Única de Consultas -->
-      <div class="grid grid-cols-2 gap-3 max-w-md w-full mx-auto">
+      <!-- Fila Única de Consultas con Botón Ver Premios -->
+      <div class="grid grid-cols-3 gap-2 max-w-md w-full mx-auto">
         <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm">🔍 Mis Tickets</button>
         <button onclick="abrirTopTenLive()" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold py-3 rounded-xl text-xs backdrop-blur-sm">🏆 Top Compras</button>
+        <button onclick="openPremiosModal()" class="bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold py-3 rounded-xl text-xs backdrop-blur-sm">🎁 Ver Premios</button>
       </div>
 
     </div>
@@ -119,7 +144,7 @@
       </button>
     </div>
 
-    <!-- BUSCADOR INTELIGENTE EN VIVO (MUESTRA SOLO EL NÚMERO BUSCADO) -->
+    <!-- BUSCADOR INTELIGENTE EN VIVO -->
     <div class="mb-5">
       <input type="text" id="searchInput" oninput="filtrarTicketExacto()"
         class="search-input w-full px-4 py-3.5 text-sm font-black text-center tracking-widest text-gray-800"
@@ -171,6 +196,65 @@
 
 </div>
 
+<!-- MODAL SHEET DESPLEGABLE: INFORMACIÓN DE PREMIOS -->
+<div id="premiosModal" class="modal-backdrop">
+  <div class="modal-sheet p-6">
+    <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
+    
+    <div class="flex justify-between items-center mb-5">
+      <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">🎁 Premios del Sorteo</h2>
+      <button onclick="closePremiosModal()" class="text-gray-400 text-xl font-bold p-1">✕</button>
+    </div>
+
+    <!-- Lista de Contenedores de Premios -->
+    <div class="space-y-4 max-h-[55vh] overflow-y-auto pr-1">
+      
+      <!-- Premio 1 Card -->
+      <div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio1')">
+        <div class="flex gap-4 items-center">
+          <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+            <img id="imgPremio1" src="https://via.placeholder.com/300x400?text=Premio+1" class="w-full h-full object-cover" alt="Premio 1">
+          </div>
+          <div class="flex-1">
+            <h3 class="font-black text-gray-900 text-base">Primer Premio</h3>
+            <p id="descPremio1" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Sincronizando descripción oficial del primer premio...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Premio 2 Card -->
+      <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio2')">
+        <div class="flex gap-4 items-center">
+          <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+            <img id="imgPremio2" src="https://via.placeholder.com/300x400?text=Premio+2" class="w-full h-full object-cover" alt="Premio 2">
+          </div>
+          <div class="flex-1">
+            <h3 class="font-black text-gray-900 text-sm">Segundo Premio</h3>
+            <p id="descPremio2" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Sincronizando descripción oficial del segundo premio...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <button onclick="closePremiosModal()" class="btn-primary w-full py-4 text-xs font-black uppercase tracking-wider mt-5">
+      ← Hacia atrás
+    </button>
+  </div>
+</div>
+
+<!-- CAPA LIGHTBOX MULTIMEDIA HD (ESTILO CHAT CON BOTÓN X) -->
+<div id="lightboxOverlay" class="lightbox-backdrop" onclick="handleOutsideLightboxClick(event)">
+  <!-- Botón X estricto -->
+  <button onclick="closeLightboxView()" class="absolute top-6 right-6 text-white text-3xl font-black bg-black/40 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm z-50">✕</button>
+  
+  <div class="w-full max-w-md px-4" onclick="event.stopPropagation()">
+    <div class="w-full aspect-[3/4] bg-neutral-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10">
+      <img id="lightboxDisplayImg" src="" class="w-full h-full object-cover" alt="Visualización HD">
+    </div>
+  </div>
+</div>
+
 <!-- MODAL TABLA TOP 10 -->
 <div id="topTenModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
@@ -195,57 +279,43 @@
   </div>
 </div>
 
-<!-- MODAL PROCEDER AL PAGO (EDITADO AQUI PARA AGREGAR EL FORMULARIO) -->
+<!-- MODAL PROCEDER AL PAGO -->
 <div id="payModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
     <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
     <h2 class="text-xl font-black text-gray-900 mb-4">Completar Solicitud 🎟️</h2>
     
     <div id="checkoutFormContainer">
-      <!-- FORMULARIO DE RECOLECCIÓN DE DATOS Y COMPROBANTE -->
       <form id="paymentForm" onsubmit="procesarFormulario(event)" class="space-y-4">
-        
-        <!-- Nombre -->
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">Nombre Completo</label>
           <input type="text" id="payNombre" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: Juan Pérez" />
         </div>
-
-        <!-- Cédula -->
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">Número de Cédula</label>
           <input type="text" id="payCedula" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 12345678" />
         </div>
-
-        <!-- WhatsApp -->
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">Número de WhatsApp</label>
           <input type="tel" id="payWhatsapp" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 04141234567" />
           <p class="text-[10px] text-rose-500 mt-1 font-bold">⚠️ Obligatorio: Debe ser un número con WhatsApp activo.</p>
         </div>
-
-        <!-- Últimos 6 dígitos -->
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">Últimos 6 dígitos del comprobante</label>
           <input type="text" id="payReferencia" required maxlength="6" class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 123456" />
         </div>
-
-        <!-- Subir Imagen -->
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">Subir Comprobante (Imagen)</label>
           <div class="border-2 border-dashed border-gray-300 rounded-xl p-3 text-center bg-gray-50">
             <input type="file" id="payComprobante" accept="image/*" required class="w-full text-xs font-bold text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-rose-100 file:text-rose-700 hover:file:bg-rose-200" />
           </div>
         </div>
-
-        <!-- Botón de Confirmar -->
         <button type="submit" class="w-full bg-emerald-500 text-white font-black py-4 rounded-xl text-sm tracking-wide shadow-md hover:bg-emerald-600 transition-colors mt-2">
           ✅ Confirmar Boleto y Pago
         </button>
       </form>
     </div>
 
-    <!-- Botón Volver -->
     <button onclick="document.getElementById('payModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold mt-3">Volver a Modificar Números</button>
   </div>
 </div>
@@ -260,7 +330,6 @@
     document.getElementById('displayCantidadAzar').textContent = cantidadAzar;
   }
 
-  // FILTRADO DINÁMICO EXACTO EN VIVO
   function filtrarTicketExacto() {
     const query = document.getElementById('searchInput').value.trim();
     const tickets = document.querySelectorAll('.ticket');
@@ -272,6 +341,32 @@
         ticket.style.display = (numeroTicket === query.padStart(2, '0')) ? 'flex' : 'none';
       }
     });
+  }
+
+  // Controladores de Premios Modales (Copiados de index)
+  function openPremiosModal() {
+    document.getElementById('premiosModal').style.display = 'flex';
+  }
+  function closePremiosModal() {
+    document.getElementById('premiosModal').style.display = 'none';
+  }
+  
+  // Sistema Lightbox de Imagen HD Estilo Chat
+  function triggerLightboxView(imgElementId) {
+    const targetImgSrc = document.getElementById(imgElementId).src;
+    if (!targetImgSrc || targetImgSrc.includes('placeholder')) return;
+    
+    document.getElementById('lightboxDisplayImg').src = targetImgSrc;
+    document.getElementById('lightboxOverlay').style.display = 'flex';
+  }
+  
+  function closeLightboxView() {
+    document.getElementById('lightboxOverlay').style.display = 'none';
+    document.getElementById('lightboxDisplayImg').src = '';
+  }
+
+  function handleOutsideLightboxClick(e) {
+    closeLightboxView();
   }
 
   function openVerifyModal() { document.getElementById('verifyModal').style.display = 'flex'; }
@@ -293,18 +388,21 @@
      } catch(e) { console.error(e); }
   }
 
-  // NUEVA FUNCION: Previene que la pagina se recargue al darle click a "Confirmar Pago"
   function procesarFormulario(e) {
     e.preventDefault();
-    // NOTA PARA TI: Aquí es donde tu archivo app.js debe recolectar los datos (payNombre.value, etc) 
-    // y subir la imagen a Supabase. Como no tocamos app.js, dejo el form listo visualmente.
     console.log("Formulario enviado. Conecta esto en tu app.js");
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
-      if(config && config.flyer_url) document.getElementById('activeFlyerImg').src = config.flyer_url;
+      if(config) {
+        if(config.flyer_url) document.getElementById('activeFlyerImg').src = config.flyer_url;
+        if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
+        if(config.premio1_img) document.getElementById('imgPremio1').src = config.premio1_img;
+        if(config.premio2_desc) document.getElementById('descPremio2').textContent = config.premio2_desc;
+        if(config.premio2_img) document.getElementById('imgPremio2').src = config.premio2_img;
+      }
     } catch(e) { console.error(e); }
   });
 </script>
