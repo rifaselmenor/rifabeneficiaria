@@ -264,12 +264,15 @@
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       // Consulta tabla de configuraciones del landing
-      const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
+      const { data: config, error: configError } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
+      
+      if (configError) console.error("Error cargando configuración:", configError);
+
       if(config) {
         if(config.flyer_url) document.getElementById('landingFlyerImg').src = config.flyer_url;
         if(config.mensaje) document.getElementById('landingMsgText').textContent = config.mensaje;
         
-        // Mapeo dinámico de URLs del bucket e información de texto (CIRUGÍA PREMIOS EXITOSA)
+        // Mapeo dinámico de URLs del bucket e información de texto
         if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
         if(config.premio1_img) document.getElementById('imgPremio1').src = config.premio1_img;
         
@@ -277,16 +280,27 @@
         if(config.premio2_img) document.getElementById('imgPremio2').src = config.premio2_img;
       }
 
-      // Cálculo en tiempo real de la barra de progreso
-      const { data: tkts } = await db.from('tickets').select('estado');
-      if(tkts) {
-        const reservados = tkts.filter(t => t.estado === 'vendido' || t.estado === 'apartado').length;
-        const porcentajeVenta = Math.min(100, Math.round((reservados / 100) * 100));
+      // Cálculo en tiempo real de la barra de progreso tolerando tablas vacías y nombres cruzados
+      const { data: tkts, error: tktsError } = await db.from('tickets').select('*');
+      
+      if (tktsError) console.error("Error cargando tabla de tickets:", tktsError);
+
+      if(tkts && tkts.length > 0) {
+        const reservados = tkts.filter(t => {
+          const valorEstado = t.status || t.estado || '';
+          return valorEstado === 'vendido' || valorEstado === 'apartado';
+        }).length;
+        
+        const porcentajeVenta = Math.min(100, Math.round((reservados / tkts.length) * 100));
         document.getElementById('salesPct').textContent = porcentajeVenta + '%';
         document.getElementById('salesFill').style.width = porcentajeVenta + '%';
+      } else {
+        // En caso de que la tabla de tickets no tenga registros, fija un 0% seguro y limpio
+        document.getElementById('salesPct').textContent = '0%';
+        document.getElementById('salesFill').style.width = '0%';
       }
     } catch(error) {
-      console.error("Error cargando configuración inicial:", error);
+      console.error("Error crítico ejecutando carga inicial:", error);
     }
   });
 </script>
