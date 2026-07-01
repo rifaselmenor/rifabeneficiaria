@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (document.getElementById('statMin')) document.getElementById('statMin').textContent = MINIMO_BOLETOS;
   if (document.getElementById('minLabel')) document.getElementById('minLabel').textContent = MINIMO_BOLETOS;
 
-  // Ocultar controles de paginación del HTML porque ahora se muestran los 100 números de una vez
+  // Ocultar controles de paginación obsoletos
   const paginationControls = [
     document.getElementById('btnPrev'),
     document.getElementById('btnNext'),
@@ -105,14 +105,12 @@ function configurarBotonesDinamicos() {
 // 3. CARGA DE TICKETS (00 al 99)
 // ==========================================
 async function loadTickets() {
-  // Inicializamos los 100 boletos con formato de 2 dígitos (00, 01, ..., 99)
   for (let i = 0; i < TOTAL_BOLETOS; i++) {
     let numStr = i.toString().padStart(2, '0');
     ticketStates.set(numStr, 'available');
   }
   
   try {
-    // Pedimos a la BD un límite alto (1000) por seguridad para garantizar traer los 100
     const { data, error } = await db.from('tickets').select('numero,estado').in('estado', ['pendiente','vendido']).range(0, 1000);
     if (error) throw error;
     
@@ -163,16 +161,28 @@ function renderGrid() {
   if (!grid) return;
   grid.innerHTML = '';
   
-  // Como es de 100, pintamos directo la lista completa, sin paginador real.
-  // Pero necesitamos renderizar todos los números (00 al 99) y pintar los que no estén en availableList como ocupados si queremos mostrarlos,
-  // O como lo solicitaste: solo pintamos availableList o pintamos la cuadricula entera.
-  // Tu código original de la IA anterior pintaba SOLO los disponibles. Mantengo tu lógica exacta:
-  for (let i = 0; i < availableList.length; i++) {
-    let numStr = availableList[i];
+  for (let i = 0; i < TOTAL_BOLETOS; i++) {
+    let numStr = i.toString().padStart(2, '0');
+    let estado = ticketStates.get(numStr);
+    
     let t = document.createElement('div');
-    t.className = 'ticket ' + (selectedTickets.has(numStr) ? 'ticket-selected' : 'ticket-available');
     t.textContent = numStr;
-    t.onclick = () => toggleTicket(numStr);
+    
+    if (selectedTickets.has(numStr)) {
+      t.className = 'ticket ticket-selected';
+      t.onclick = () => toggleTicket(numStr);
+    } else if (estado === 'vendido') {
+      t.className = 'ticket ticket-sold';
+      t.style.opacity = '0.3';
+      t.style.pointerEvents = 'none';
+    } else if (estado === 'pendiente') {
+      t.className = 'ticket ticket-pending';
+      t.style.opacity = '0.5';
+      t.style.pointerEvents = 'none';
+    } else {
+      t.className = 'ticket ticket-available';
+      t.onclick = () => toggleTicket(numStr);
+    }
     grid.appendChild(t);
   }
 }
@@ -197,14 +207,12 @@ function randomSelect() {
     return;
   }
   
-  // Algoritmo Fisher-Yates para barajar limpiamente
   let pool = [...availableList];
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
   
-  // Seleccionamos los primeros N tickets
   for (let i = 0; i < cantidadAzar; i++) {
     selectedTickets.add(pool[i]);
   }
@@ -324,7 +332,6 @@ async function submitOrder(e) {
   try {
     let captureUrl = null;
     
-    // 1. Subir Capture a Supabase Storage
     if (file) {
       const ext = file.name.split('.').pop();
       const fileName = `pagos/${Date.now()}_${cedula}.${ext}`;
@@ -334,7 +341,6 @@ async function submitOrder(e) {
       captureUrl = publicUrlData.publicUrl;
     }
 
-    // 2. Insertar en tabla de Pedidos
     const { data: pedidoData, error: pedidoError } = await db.from('pedidos').insert([{
         nombre: nombre, 
         cedula: cedula, 
@@ -347,7 +353,6 @@ async function submitOrder(e) {
       }]).select().single();
     if (pedidoError) throw pedidoError;
 
-    // 3. Insertar los boletos reservados en la tabla Tickets
     const ticketsToInsert = boletosArray.map(num => ({ 
       numero: parseInt(num, 10), 
       estado: 'pendiente', 
@@ -357,7 +362,6 @@ async function submitOrder(e) {
     const { error: ticketsError } = await db.from('tickets').insert(ticketsToInsert);
     if (ticketsError) throw ticketsError;
 
-    // 4. Limpiar lista local
     boletosArray.forEach(n => {
        ticketStates.set(n, 'pendiente');
        let idx = availableList.indexOf(n);
@@ -367,12 +371,10 @@ async function submitOrder(e) {
     updateSalesBar(); 
     renderGrid();
     
-    // 5. Notificar por Telegram
     try { 
       await notificarTelegram(nombre, boletosStr, totalPagado, referencia); 
-    } catch (telErr) { console.warn("Error enviando Telegram, pero la compra se procesó"); }
+    } catch (telErr) { console.warn("Error enviando Telegram"); }
     
-    // 6. Cerrar modal y mostrar éxito
     document.getElementById('payModal').style.display = 'none';
     const summary = document.getElementById('successSummary');
     if(summary) {
@@ -421,7 +423,7 @@ if (searchInput) {
       let tickets = document.querySelectorAll('.ticket');
       tickets.forEach(tk => {
         if (tk.textContent === val) {
-          tk.style.boxShadow = '0 0 15px #E11D48'; // Respetando tu color rojo/rosa
+          tk.style.boxShadow = '0 0 15px #E11D48'; 
           setTimeout(() => tk.style.boxShadow = '', 2000);
         }
       });
@@ -473,17 +475,55 @@ async function buscarMisBoletos() {
 }
 
 // ==========================================
-// 10. UTILIDADES EXTRA
+// 10. MODAL DINÁMICO: VER PREMIOS
+// ==========================================
+function closePremiosModal() {
+  document.getElementById('premiosModal').style.display = 'none';
+}
+
+async function openPremiosModal() {
+  const modal = document.getElementById('premiosModal');
+  const container = document.getElementById('premiosContainer');
+  if(!modal || !container) return;
+
+  modal.style.display = 'flex';
+  container.innerHTML = '<div style="text-align:center;color:#6b7280;padding:20px;">⏳ Cargando los premios de la rifa...</div>';
+
+  try {
+    const { data: premios, error } = await db.from('premios').select('*').order('id', { ascending: true });
+    if(error) throw error;
+
+    if(!premios || premios.length === 0) {
+      container.innerHTML = '<div style="text-align:center;color:#6b7280;padding:20px;">🎁 Los premios se anunciarán muy pronto.</div>';
+      return;
+    }
+
+    let html = '';
+    premios.forEach(p => {
+      html += `
+        <div style="background:#fff; border:1px solid #fbcfe8; border-radius:16px; padding:16px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05); display:flex; flex-direction:column; align-items:center; text-align:center;">
+          ${p.imagen_url ? `<img src="${p.imagen_url}" alt="${p.titulo}" style="width:100%; max-height:220px; object-fit:contain; border-radius:12px; margin-bottom:12px; background:#f9fafb;">` : ''}
+          <h3 style="font-size:18px; font-weight:800; color:#1f2937; margin-bottom:4px;">${p.titulo}</h3>
+          <p style="font-size:14px; color:#4b5563; margin:0;">${p.descripcion || ''}</p>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  } catch(e) {
+    console.error(e);
+    container.innerHTML = '<div style="text-align:center;color:#ef4444;padding:20px;font-weight:700;">❌ No se pudieron cargar los premios.</div>';
+  }
+}
+
+// ==========================================
+// 11. UTILIDADES EXTRA Y NAVEGACIÓN
 // ==========================================
 function showToast(msg, duration = 2000) {
   const old = document.querySelector('.toast'); 
   if (old) old.remove();
-  
   const t = document.createElement('div');
-  // Respetando tus clases de Tailwind rosadas/claras que mandaste
   t.className = 'toast bg-white border border-pink-200 text-gray-900 shadow-xl'; 
   t.textContent = msg;
-  
   document.body.appendChild(t); 
   setTimeout(() => t.remove(), duration);
 }
@@ -492,49 +532,29 @@ function startVIPCountdown() {
   let c = 3; 
   let cdNum = document.getElementById('cdNum'); 
   if(cdNum) cdNum.textContent = c;
-  
   let cdRing = document.getElementById('cdRing'); 
   if(cdRing) cdRing.style.setProperty('--pct', '100%');
-  
   if (cdInterval) clearInterval(cdInterval);
   
   cdInterval = setInterval(() => {
     c--; 
     if(cdNum) cdNum.textContent = c; 
     if(cdRing) cdRing.style.setProperty('--pct', (c/3)*100 + '%');
-    
-    if (c <= 0) { 
-      clearInterval(cdInterval); 
-      goVIP(); 
-    }
+    if (c <= 0) { clearInterval(cdInterval); goVIP(); }
   }, 1000);
 }
 
-function goVIP() { 
-  window.location.href = VIP_URL; 
-}
-
-function closeSuccessModal() { 
-  document.getElementById('successModal').style.display = 'none'; 
-  window.location.reload(); 
-}
-
-// Funciones Dummy para prevenir errores si el HTML aún llama a los botones de Paginación antiguos
+function goVIP() { window.location.href = VIP_URL; }
+function closeSuccessModal() { document.getElementById('successModal').style.display = 'none'; window.location.reload(); }
 function changePage(dir) { showToast('Todos los boletos están listados aquí mismo.'); }
 function jumpToPage() { showToast('Todos los boletos están listados aquí mismo.'); }
 
-// ==========================================
-// 11. NAVEGACIÓN INICIAL
-// ==========================================
 function comenzarCompra() {
   const ticketSection = document.getElementById('mainTicketSection');
   const floatingBar = document.getElementById('mainFloatingBar');
-
   if (ticketSection && floatingBar) {
     ticketSection.style.display = 'block';
     floatingBar.style.display = 'block';
     ticketSection.scrollIntoView({ behavior: 'smooth' });
-  } else {
-    console.error("Contenedores no encontrados");
   }
 }
