@@ -523,3 +523,18 @@ function closeSuccessModal() {
 function changePage(dir) { showToast('Todos los boletos están listados aquí mismo.'); }
 function jumpToPage() { showToast('Todos los boletos están listados aquí mismo.'); }
 
+// ==========================================
+// 11. NAVEGACIÓN INICIAL
+// ==========================================
+function comenzarCompra() {
+  const ticketSection = document.getElementById('mainTicketSection');
+  const floatingBar = document.getElementById('mainFloatingBar');
+
+  if (ticketSection && floatingBar) {
+    ticketSection.style.display = 'block';
+    floatingBar.style.display = 'block';
+    ticketSection.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    console.error("Contenedores no encontrados");
+  }
+}
