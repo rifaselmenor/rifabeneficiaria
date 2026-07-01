@@ -3,223 +3,242 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Rifa Ana 🌸</title>
+  <title>Rifa Ana — Bienvenidos 🌸</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --primary: #EF4444;
+      --rose: #F43F5E;
+      --rose-light: #FDA4AF;
       --bg: #FFFFFF;
-      --glass: rgba(255, 255, 255, 0.45);
-      --glass-border: rgba(255, 255, 255, 0.6);
+      --glass: rgba(255, 255, 255, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.8);
       --text: #1F2937;
-      --text-muted: #4B5563;
     }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Nunito', sans-serif;
       background: var(--bg); color: var(--text);
-      min-height: 100vh; overflow-x: hidden;
-      position: relative;
+      min-height: 100vh; position: relative;
     }
-    /* Fondo estético floral y destellos sutiles */
     body::before {
       content: ''; position: fixed; inset: 0;
       background: 
-        radial-gradient(circle at 10% 20%, rgba(255, 241, 242, 0.8) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(244, 63, 94, 0.08) 0%, transparent 50%);
+        radial-gradient(circle at 20% 20%, rgba(255, 241, 242, 0.9) 0%, transparent 60%),
+        radial-gradient(circle at 80% 80%, rgba(244, 63, 94, 0.05) 0%, transparent 60%);
       pointer-events: none; z-index: 0;
     }
     .content { position: relative; z-index: 1; }
-
-    /* Efecto Neon Glass Blanco */
     .neon-glass {
       background: var(--glass);
-      backdrop-filter: blur(16px) saturate(120%);
-      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--glass-border);
-      box-shadow: 0 8px 32px 0 rgba(244, 63, 94, 0.06), inset 0 1px 0 rgba(255,255,255,0.8);
+      box-shadow: 0 10px 30px rgba(244, 63, 94, 0.04);
     }
-    
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
     .btn-primary {
-      background: linear-gradient(135deg, #F43F5E 0%, #FDA4AF 100%);
-      color: #fff; font-weight: 900; border-radius: 16px; cursor: pointer;
-      transition: transform .15s, box-shadow .15s;
-      box-shadow: 0 10px 25px rgba(244, 63, 94, 0.25);
+      background: linear-gradient(135deg, var(--rose) 0%, #FDA4AF 100%);
+      color: #fff; font-weight: 900; border-radius: 20px;
+      transition: transform .15s; box-shadow: 0 6px 20px rgba(244, 63, 94, 0.2);
     }
-    .btn-primary:active { transform: scale(.97); }
+    .btn-primary:active { transform: scale(.96); }
+    
+    .btn-outline-rose {
+      background: #FFFFFF; border: 2px solid #FFE4E6;
+      color: var(--rose); font-weight: 900; border-radius: 20px;
+      transition: all .15s; box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    }
+    .btn-outline-rose:active { transform: scale(.96); background: #FFF1F2; }
 
-    /* Modales */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px); z-index: 200;
-      display: flex; align-items: flex-end; animation: fadeIn .2s ease;
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200;
+      display: flex; align-items: flex-end;
     }
-    @keyframes fadeIn { from{ opacity:0 } to{ opacity:1 } }
     .modal-sheet {
       width: 100%; background: #FFFFFF;
-      border-top-left-radius: 28px; border-top-right-radius: 28px;
-      border-top: 1px solid rgba(244, 63, 94, 0.2);
-      max-height: 92vh; overflow-y: auto;
-      animation: slideUp .3s cubic-bezier(.34,1.56,.64,1);
+      border-top-left-radius: 32px; border-top-right-radius: 32px;
+      max-height: 85vh; overflow-y: auto;
     }
-    @keyframes slideUp { from{ transform:translateY(100%) } to{ transform:translateY(0) } }
+    .copy-btn { color: var(--rose); font-size: 13px; cursor: pointer; }
   </style>
 </head>
 <body>
-<div class="content max-w-xl mx-auto px-4 pt-4 pb-12">
+<div class="content min-h-screen flex flex-col justify-between pb-8">
 
-  <!-- ENCABEZADO FLORAL -->
-  <div class="text-center my-6">
-    <span class="text-4xl animate-pulse block mb-2">🌸</span>
-    <h1 class="text-3xl font-black tracking-tight text-gray-900">Rifa Ana</h1>
-    <p class="text-sm font-bold text-rose-500 uppercase tracking-widest mt-1">Gran Sorteo de Apoyo</p>
-  </div>
-
-  <!-- CARRUSEL DINÁMICO (Conectado al mismo backend) -->
-  <div class="carousel-wrapper relative w-full overflow-hidden rounded-3xl border-2 border-white shadow-xl neon-glass mb-6" id="headerCarousel">
-    <div id="mainCarousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar">
-      <div class="min-w-full snap-center relative">
-        <img id="activeFlyerImg" src="https://via.placeholder.com/600x600?text=Cargando+Flyer..." class="w-full aspect-square object-cover" alt="Sorteo Actual">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-5">
-          <div class="flex items-center gap-2 mb-1.5">
-            <span class="bg-emerald-500 rounded-full w-2.5 h-2.5 animate-pulse"></span>
-            <span class="text-xs font-black text-emerald-400 tracking-widest uppercase">DISPONIBLE</span>
-          </div>
-          <h2 id="activeMsgText" class="text-xl font-black text-white drop-shadow-md mb-2">Cargando información...</h2>
-          
-          <!-- Barra de Progreso de Ventas -->
-          <div class="w-full bg-black/40 backdrop-blur-md border border-white/20 p-3 rounded-2xl">
-             <div class="flex justify-between items-center mb-1">
-               <span class="text-[11px] text-gray-200 font-bold">Progreso de Ventas</span>
-               <span class="text-[11px] font-black text-rose-400" id="salesPct">0%</span>
-             </div>
-             <div class="bg-white/20 h-2 rounded-full overflow-hidden">
-               <div class="bg-gradient-to-r from-rose-500 to-pink-400 h-full transition-all duration-700" id="salesFill" style="width:0%"></div>
-             </div>
-          </div>
+  <!-- HERO HEADER -->
+  <div class="relative w-full bg-gray-50 border-b border-gray-100 shadow-sm">
+    <img id="landingFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando+Sorteo..." class="w-full aspect-[4/5] object-cover" alt="Sorteo Ana">
+    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-6">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="bg-rose-500 rounded-full w-2.5 h-2.5 animate-pulse"></span>
+        <span class="text-xs font-black text-rose-400 tracking-widest uppercase">DISPONIBLE</span>
+      </div>
+      <h1 id="landingMsgText" class="text-2xl font-black text-white mb-4">Cargando información...</h1>
+      
+      <!-- Barra Progreso Ventas -->
+      <div class="w-full bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl shadow-lg">
+        <div class="flex justify-between items-center mb-1.5">
+          <span class="text-xs text-white font-bold">Progreso de Ventas</span>
+          <span class="text-xs font-black text-rose-300" id="salesPct">0%</span>
+        </div>
+        <div class="bg-black/30 h-2.5 rounded-full overflow-hidden">
+          <div class="bg-gradient-to-r from-rose-500 to-pink-300 h-full transition-all duration-700" id="salesFill" style="width:0%"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ACCIONES PRINCIPALES (Neon Glass Blanco) -->
-  <div class="neon-glass rounded-3xl p-5 text-center space-y-4">
-    <div class="text-sm font-bold text-gray-600">¡Apóyanos y participa por maravillosos premios! Elige tus números de la suerte.</div>
+  <!-- SECCIÓN CENTRAL DE ACCIONES REVISADA -->
+  <div class="px-6 my-6 text-center">
+    <p class="text-sm text-gray-500 font-bold mb-5 px-2">
+      ¡Apóyanos y participa por maravillosos premios! Elige tus números de la suerte.
+    </p>
     
-    <div class="grid grid-cols-2 gap-3">
-      <!-- BOTÓN VER PREMIO (Reemplaza la función del top 10) -->
-      <button onclick="openPremiosModal()" class="bg-white border-2 border-rose-200 text-rose-600 font-black py-4 rounded-2xl shadow-sm transition transform active:scale-95 text-sm flex items-center justify-center gap-2">
+    <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+      <button onclick="openPremiosModal()" class="btn-outline-rose py-4 flex items-center justify-center gap-2 text-sm">
         🎁 Ver Premios
       </button>
-
-      <!-- REDIRECCIÓN AL ARCHIVO DE COMPRAS -->
-      <a href="rifa.html" class="btn-primary py-4 text-sm font-black flex items-center justify-center gap-1">
+      <a href="rifas.html" class="btn-primary py-4 flex items-center justify-center gap-2 text-sm text-center">
         🎟️ Comprar Tickets →
       </a>
     </div>
   </div>
 
-  <!-- DATOS DE PAGO MÓVIL DIRECTO EN LA PORTADA -->
-  <div class="neon-glass rounded-3xl p-5 mt-6 space-y-3">
-    <h3 class="text-xs font-black text-rose-500 uppercase tracking-widest flex items-center gap-1">💳 Datos de Pago Móvil Oficial</h3>
-    
-    <div class="space-y-2 text-sm font-bold text-gray-700">
-      <div class="flex justify-between bg-white/60 p-3 rounded-xl border border-rose-100">
-        <span class="text-gray-400">Banco:</span>
-        <span>BNC 0191</span>
+  <!-- DATOS DE PAGO MÓVIL OFICIALES (FIJOS EN HOME) -->
+  <div class="px-6 max-w-md mx-auto w-full">
+    <div class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm border-t-4 border-t-rose-400">
+      <div class="text-xs font-black text-rose-500 mb-4 tracking-wider uppercase flex items-center gap-1.5">
+        💳 Datos de Pago Móvil Oficial
       </div>
-      <div class="flex justify-between bg-white/60 p-3 rounded-xl border border-rose-100">
-        <span class="text-gray-400">C.I:</span>
-        <span>19479080</span>
-      </div>
-      <div class="flex justify-between bg-white/60 p-3 rounded-xl border border-rose-100">
-        <span class="text-gray-400">Teléfono:</span>
-        <span>04269395786</span>
+      <div class="space-y-3 text-sm text-gray-700 font-bold">
+        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
+          <span class="text-gray-400 text-xs">Banco:</span>
+          <span class="text-gray-800">BNC 0191 <span class="copy-btn ml-1" onclick="copyText('0191')">📋</span></span>
+        </div>
+        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
+          <span class="text-gray-400 text-xs">C.I:</span>
+          <span class="text-gray-800">19479080 <span class="copy-btn ml-1" onclick="copyText('19479080')">📋</span></span>
+        </div>
+        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
+          <span class="text-gray-400 text-xs">Teléfono:</span>
+          <span class="text-gray-800">04269395786 <span class="copy-btn ml-1" onclick="copyText('04269395786')">📋</span></span>
+        </div>
       </div>
     </div>
   </div>
 
 </div>
 
-<!-- VENTANA MODAL: DETALLES DE LOS PREMIOS -->
-<div id="premiosModal" class="modal-overlay" style="display:none;" onclick="closePremiosModal()">
-  <div class="modal-sheet p-6" onclick="event.stopPropagation()">
-    <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-5"></div>
+<!-- MODAL DESPLEGABLE: PREMIOS DEL SORTEO (IMÁGENES ADAPTABLES) -->
+<div id="premiosModal" class="modal-overlay" style="display:none">
+  <div class="modal-sheet p-6">
+    <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
     
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-2xl font-black text-gray-900 flex items-center gap-2">🎁 Premios del Sorteo</h2>
-      <button onclick="closePremiosModal()" class="text-gray-400 font-bold text-xl p-1">✕</button>
+    <div class="flex justify-between items-center mb-5">
+      <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">🎁 Premios del Sorteo</h2>
+      <button onclick="closePremiosModal()" class="text-gray-400 text-xl font-bold p-1">✕</button>
     </div>
 
-    <!-- Lista Dinámica/Estática de Premios -->
-    <div class="space-y-4 max-h-[60vh] overflow-y-auto hide-scrollbar mb-6">
-      <div class="bg-rose-50/50 border border-rose-100 p-4 rounded-2xl flex gap-3">
-        <span class="text-3xl">🥇</span>
-        <div>
-          <h4 class="font-black text-gray-900 text-base">Primer Premio</h4>
-          <p class="text-xs text-gray-500 mt-1 leading-relaxed">¡Gran Combo Sorpresa! El premio principal esperado por todos. Los detalles completos se sincronizan directamente.</p>
+    <!-- Lista Dinámica de Premios -->
+    <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1" id="listaPremiosContenedor">
+      <!-- Premio 1 -->
+      <div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4">
+        <div class="flex gap-4 items-center">
+          <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center text-3xl shrink-0 shadow-sm overflow-hidden">
+            <img id="imgPremio1" src="https://via.placeholder.com/150?text=Premio+1" class="w-full h-full object-cover hidden" alt="P1">
+            <span id="iconPremio1">🥇</span>
+          </div>
+          <div>
+            <h3 class="font-black text-gray-900 text-base">Primer Premio</h3>
+            <p id="descPremio1" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">¡Gran Combo Sorpresa! El premio principal esperado por todos. Los detalles completos se sincronizan directamente.</p>
+          </div>
         </div>
       </div>
 
-      <div class="bg-rose-50/50 border border-rose-100 p-4 rounded-2xl flex gap-3">
-        <span class="text-3xl">🥈</span>
-        <div>
-          <h4 class="font-black text-gray-900 text-base">Segundo Premio</h4>
-          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Un espectacular incentivo adicional para los colaboradores del sorteo.</p>
+      <!-- Premio 2 -->
+      <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4">
+        <div class="flex gap-4 items-center">
+          <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-3xl shrink-0 shadow-sm overflow-hidden">
+            <img id="imgPremio2" src="https://via.placeholder.com/150?text=Premio+2" class="w-full h-full object-cover hidden" alt="P2">
+            <span id="iconPremio2">🥈</span>
+          </div>
+          <div>
+            <h3 class="font-black text-gray-900 text-sm">Segundo Premio</h3>
+            <p id="descPremio2" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Un espectacular incentivo adicional para los colaboradores del sorteo.</p>
+          </div>
         </div>
       </div>
 
-      <div class="bg-rose-50/50 border border-rose-100 p-4 rounded-2xl flex gap-3">
-        <span class="text-3xl">🥉</span>
-        <div>
-          <h4 class="font-black text-gray-900 text-base">Tercer Premio</h4>
-          <p class="text-xs text-gray-500 mt-1 leading-relaxed">Premio especial de agradecimiento por tu valioso apoyo a la causa.</p>
+      <!-- Premio 3 -->
+      <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4">
+        <div class="flex gap-4 items-center">
+          <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-3xl shrink-0 shadow-sm overflow-hidden">
+            <img id="imgPremio3" src="https://via.placeholder.com/150?text=Premio+3" class="w-full h-full object-cover hidden" alt="P3">
+            <span id="iconPremio3">🥉</span>
+          </div>
+          <div>
+            <h3 class="font-black text-gray-900 text-sm">Tercer Premio</h3>
+            <p id="descPremio3" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Premio especial de agradecimiento por tu valioso apoyo a la causa.</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <button onclick="closePremiosModal()" class="btn-primary w-full py-4 text-base">Cerrar Ventana</button>
+    <button onclick="closePremiosModal()" class="btn-primary w-full py-4 text-xs font-black uppercase tracking-wider mt-5">
+      Cerrar Ventana
+    </button>
   </div>
 </div>
 
-<!-- CONEXIÓN CON TU BASE DE DATOS SUPABASE (Mantiene sincronizado el Flyer y progreso) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=2"></script>
 <script>
-  function openPremiosModal() {
-    document.getElementById('premiosModal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-  }
-  function closePremiosModal() {
-    document.getElementById('premiosModal').style.display = 'none';
-    document.body.style.overflow = '';
+  function openPremiosModal() { document.getElementById('premiosModal').style.display = 'flex'; }
+  function closePremiosModal() { document.getElementById('premiosModal').style.display = 'none'; }
+  
+  function copyText(txt) {
+    navigator.clipboard.writeText(txt);
+    alert("Copiado al portapapeles: " + txt);
   }
 
-  // Carga automática del Flyer y estadísticas desde tu Supabase existente
+  // Inicialización básica y carga de config de Supabase
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
       if(config) {
-          if(config.flyer_url) document.getElementById('activeFlyerImg').src = config.flyer_url;
-          if(config.mensaje) document.getElementById('activeMsgText').textContent = config.mensaje;
+        if(config.flyer_url) document.getElementById('landingFlyerImg').src = config.flyer_url;
+        if(config.mensaje) document.getElementById('landingMsgText').textContent = config.mensaje;
+        
+        // Mapeo de premios si vienen desde base de datos
+        if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
+        if(config.premio1_img) {
+          document.getElementById('imgPremio1').src = config.premio1_img;
+          document.getElementById('imgPremio1').classList.remove('hidden');
+          document.getElementById('iconPremio1').classList.add('hidden');
+        }
+        if(config.premio2_desc) document.getElementById('descPremio2').textContent = config.premio2_desc;
+        if(config.premio2_img) {
+          document.getElementById('imgPremio2').src = config.premio2_img;
+          document.getElementById('imgPremio2').classList.remove('hidden');
+          document.getElementById('iconPremio2').classList.add('hidden');
+        }
+        if(config.premio3_desc) document.getElementById('descPremio3').textContent = config.premio3_desc;
+        if(config.premio3_img) {
+          document.getElementById('imgPremio3').src = config.premio3_img;
+          document.getElementById('imgPremio3').classList.remove('hidden');
+          document.getElementById('iconPremio3').classList.add('hidden');
+        }
       }
-      
-      // Sincronizar porcentaje de barra si la tabla tickets_v2 existe
-      const { data: vendidos, count } = await db.from('tickets_v2').select('*', { count: 'exact', head: true }).eq('estado', 'vendido');
-      if(count !== null) {
-          const pct = Math.min(Math.round((count / 100) * 100), 100);
-          document.getElementById('salesPct').textContent = pct + '%';
-          document.getElementById('salesFill').style.width = pct + '%';
+
+      // Calcular barra de progreso real basada en 100 tickets totales
+      const { data: tkts } = await db.from('tickets_v2').select('status');
+      if(tkts) {
+        const vendidos = tkts.filter(t => t.status === 'vendido' || t.status === 'apartado').length;
+        const pct = Math.min(100, Math.round((vendidos / 100) * 100));
+        document.getElementById('salesPct').textContent = pct + '%';
+        document.getElementById('salesFill').style.width = pct + '%';
       }
-    } catch (e) {
-      console.log("Modo standalone o cargando parámetros iniciales.");
-    }
+    } catch(e) { console.error(e); }
   });
 </script>
 </body>
-    </html>
-               
+</html>
