@@ -75,7 +75,6 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       z-index: 200;
-      display: none;
       align-items: flex-end;
     }
 
@@ -85,7 +84,6 @@
       inset: 0;
       background: rgba(0, 0, 0, 0.95);
       z-index: 300;
-      display: none;
       align-items: center;
       justify-content: center;
       padding: 16px;
@@ -95,16 +93,15 @@
 <body>
 <div class="content">
 
-  <!-- HERO SUPERIOR REVISADO CON NUEVO BOTÓN VER PREMIOS -->
+  <!-- HERO SUPERIOR REVISADO (SIN TOP COMPRAS, CON BOTÓN VER PREMIOS) -->
   <div class="relative w-full overflow-hidden bg-gray-50 border-b border-gray-100 shadow-sm">
     <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover" alt="Sorteo">
     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-4 pb-6">
       
       <!-- Fila Única de Consultas con Botón Ver Premios -->
-      <div class="grid grid-cols-3 gap-2 max-w-md w-full mx-auto">
-        <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm">🔍 Mis Tickets</button>
-        <button onclick="abrirTopTenLive()" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold py-3 rounded-xl text-xs backdrop-blur-sm">🏆 Top Compras</button>
-        <button onclick="openPremiosModal()" class="bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold py-3 rounded-xl text-xs backdrop-blur-sm">🎁 Ver Premios</button>
+      <div class="grid grid-cols-2 gap-3 max-w-md w-full mx-auto">
+        <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm shadow-lg">🔍 Mis Tickets</button>
+        <button onclick="openPremiosModal()" class="bg-rose-500 border border-rose-400 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm shadow-lg">🎁 Ver Premios</button>
       </div>
 
     </div>
@@ -197,7 +194,7 @@
 </div>
 
 <!-- MODAL SHEET DESPLEGABLE: INFORMACIÓN DE PREMIOS -->
-<div id="premiosModal" class="modal-backdrop">
+<div id="premiosModal" class="modal-backdrop" style="display:none;">
   <div class="modal-sheet p-6">
     <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
     
@@ -244,7 +241,7 @@
 </div>
 
 <!-- CAPA LIGHTBOX MULTIMEDIA HD (ESTILO CHAT CON BOTÓN X) -->
-<div id="lightboxOverlay" class="lightbox-backdrop" onclick="handleOutsideLightboxClick(event)">
+<div id="lightboxOverlay" class="lightbox-backdrop" style="display:none;" onclick="handleOutsideLightboxClick(event)">
   <!-- Botón X estricto -->
   <button onclick="closeLightboxView()" class="absolute top-6 right-6 text-white text-3xl font-black bg-black/40 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm z-50">✕</button>
   
@@ -252,16 +249,6 @@
     <div class="w-full aspect-[3/4] bg-neutral-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10">
       <img id="lightboxDisplayImg" src="" class="w-full h-full object-cover" alt="Visualización HD">
     </div>
-  </div>
-</div>
-
-<!-- MODAL TABLA TOP 10 -->
-<div id="topTenModal" class="modal-overlay" style="display:none">
-  <div class="modal-sheet p-6">
-    <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
-    <div class="text-center mb-4"><h2 class="text-xl font-black text-amber-500">🏆 TOP COMPRADORES</h2></div>
-    <div id="topTenList" class="space-y-2 mb-4"></div>
-    <button onclick="document.getElementById('topTenModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold">Cerrar Tabla</button>
   </div>
 </div>
 
@@ -343,7 +330,7 @@
     });
   }
 
-  // Controladores de Premios Modales (Copiados de index)
+  // Controladores de Premios Modales
   function openPremiosModal() {
     document.getElementById('premiosModal').style.display = 'flex';
   }
@@ -370,40 +357,27 @@
   }
 
   function openVerifyModal() { document.getElementById('verifyModal').style.display = 'flex'; }
-  async function abrirTopTenLive() {
-     document.getElementById('topTenModal').style.display = 'flex';
-     document.getElementById('topTenList').innerHTML = '<div class="text-center py-4">⏳</div>';
-     try {
-         const { data } = await db.rpc('get_top_10_compradores');
-         let html = '';
-         if(data && data.length > 0) {
-           data.forEach((item, i) => {
-             html += `<div class="flex justify-between p-2.5 bg-gray-50 rounded-xl border border-gray-100 text-xs font-bold">
-               <span>#${i+1} - ${item.nombre}</span>
-               <span class="text-rose-600">${item.cantidad} números</span>
-             </div>`;
-           });
-         } else { html = '<div class="text-center text-xs text-gray-400">Sin registros</div>'; }
-         document.getElementById('topTenList').innerHTML = html;
-     } catch(e) { console.error(e); }
-  }
 
   function procesarFormulario(e) {
     e.preventDefault();
     console.log("Formulario enviado. Conecta esto en tu app.js");
   }
 
+  // Carga Síncrona Dinámica desde Base de Datos (Supabase)
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
       if(config) {
         if(config.flyer_url) document.getElementById('activeFlyerImg').src = config.flyer_url;
+        
+        // Carga la información de los premios si existe en la base de datos
         if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
         if(config.premio1_img) document.getElementById('imgPremio1').src = config.premio1_img;
+        
         if(config.premio2_desc) document.getElementById('descPremio2').textContent = config.premio2_desc;
         if(config.premio2_img) document.getElementById('imgPremio2').src = config.premio2_img;
       }
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error("Error cargando configuración inicial:", e); }
   });
 </script>
 </body>
