@@ -45,7 +45,7 @@
       user-select:none; position:relative; overflow:hidden;
     }
     
-    /* BOLETO DISPONIBLE - Exactamente como lo pediste */
+    /* BOLETO DISPONIBLE */
     .ticket-available {
       background: #FFFFFF !important;
       border: 2px solid #000000 !important;
@@ -98,195 +98,318 @@
     }
     .modal-sheet {
       width:100%; background:var(--bg); border-top-left-radius:28px; border-top-right-radius:28px;
-      max-height:92vh; overflow-y:auto; padding: 20px;
+      max-height:92vh; overflow-y:auto; padding:20px;
     }
     .modal-center {
-      position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:400;
-      display:flex; align-items:center; justify-content:center; padding:16px;
+      position:fixed; inset:0; background:rgba(0,0,0,.7);
+      z-index:400; display:flex; align-items:center; justify-content:center; padding:16px;
     }
-    .modal-card { background:#FFFFFF; border-radius:24px; width:100%; max-width:440px; padding: 20px; }
-
+    .modal-card {
+      background:#FFFFFF; border-radius:24px; width:100%; max-width:440px; padding:20px;
+    }
     /* Chips */
     .selected-chip {
       background:var(--surface2); border:1px solid var(--primary-light);
-      border-radius:8px; padding:4px 10px; font-size:14px; font-weight:900; color:var(--primary-dark);
+      border-radius:8px; padding:4px 10px; font-size:14px; font-weight:900;
+      color:var(--primary-dark);
+    }
+
+    .toast {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: white; border: 1px solid var(--primary-light);
+      border-radius: 12px; padding: 10px 20px; font-weight: 700;
+      box-shadow: 0 4px 12px rgba(225,29,72,0.1); z-index: 9999;
     }
   </style>
 </head>
 <body>
 
-<div class="floral-deco f-1">🌸</div>
-<div class="floral-deco f-2">🌺</div>
-<div class="floral-deco f-3">🌸</div>
-<div class="floral-deco f-4">🌺</div>
+  <div class="floral-deco f-1">🌸</div>
+  <div class="floral-deco f-2">🌺</div>
+  <div class="floral-deco f-3">🌸</div>
+  <div class="floral-deco f-4">🌺</div>
 
-<div class="content">
-  <div class="carousel-wrapper relative w-full overflow-hidden bg-white shadow-sm" id="headerCarousel">
-    <div id="mainCarousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar">
-      <div class="min-w-full snap-center relative">
-        <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover" alt="Sorteo Actual">
-        <div class="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent flex flex-col justify-end p-4 pb-8">
-          
-          <div class="flex items-center gap-2 mb-2">
-            <span class="bg-red-500 rounded-full w-3 h-3 animate-pulse"></span>
-            <span class="text-xs font-black text-red-600 tracking-widest uppercase">GRAN RIFA</span>
+  <div class="content">
+    <div class="carousel-wrapper relative w-full overflow-hidden bg-white shadow-sm" id="headerCarousel">
+      <div id="mainCarousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar">
+        <div class="w-full shrink-0 snap-start">
+          <img id="imgFlyer" src="IMG-20260701-WA0001.jpg" class="w-full object-cover max-h-[460px] mx-auto" alt="Flyer Sorteo" onerror="this.src='IMG-20260701-WA0001.jpg'" />
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-xl mx-auto px-4 pt-4 pb-32">
+      
+      <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm mb-4">
+        <div class="flex justify-between text-xs font-black uppercase text-gray-500 mb-1">
+          <span>Progreso de recaudación</span>
+          <span id="salesPct" class="text-rose-600">0%</span>
+        </div>
+        <div class="w-full bg-rose-50 h-3 rounded-full overflow-hidden border border-rose-100">
+          <div id="salesFill" class="bg-gradient-to-r from-rose-500 to-pink-400 h-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 mt-3 text-center">
+          <div class="bg-rose-50/50 rounded-xl p-2 border border-rose-100/50">
+            <div class="text-[10px] uppercase font-bold text-gray-400">Precio</div>
+            <div class="text-base font-black text-gray-900"><span id="statPrecio">5</span>$</div>
           </div>
-
-          <h2 id="activeMsgText" class="text-2xl font-black text-gray-900 mb-3">Rifa a Beneficio de Ana Quintero 🌸</h2>
-          
-          <div class="w-full mb-4 bg-white/90 backdrop-blur-md border border-pink-200 p-3 rounded-xl shadow-md">
-             <div class="flex justify-between items-center mb-1">
-               <span class="text-xs text-gray-600 font-bold">Progreso de Ventas</span>
-               <span class="text-xs font-black text-red-500" id="salesPct">0%</span>
-             </div>
-             <div class="bg-gray-200 h-3 rounded-full overflow-hidden mb-1">
-               <div class="bg-gradient-to-r from-pink-400 to-red-500 h-full transition-all duration-700" id="salesFill" style="width:0%"></div>
-             </div>
-             <div class="flex justify-between">
-               <span class="text-[10px] font-black text-red-600" id="salesSold">0</span>
-               <span class="text-[10px] text-gray-500"><span id="salesRem">100</span> restantes</span>
-             </div>
+          <div class="bg-rose-50/50 rounded-xl p-2 border border-rose-100/50">
+            <div class="text-[10px] uppercase font-bold text-gray-400">Vendidos</div>
+            <div class="text-base font-black text-rose-600" id="salesSold">0</div>
           </div>
+          <div class="bg-rose-50/50 rounded-xl p-2 border border-rose-100/50">
+            <div class="text-[10px] uppercase font-bold text-gray-400">Disponibles</div>
+            <div class="text-base font-black text-emerald-600" id="salesRem">100</div>
+          </div>
+        </div>
+      </div>
 
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="comenzarCompra()" class="bg-gradient-to-r from-red-600 to-pink-500 text-white font-black py-3 rounded-xl shadow-lg transform transition active:scale-95 text-sm">💳 COMPRAR NÚMEROS</button>
-            <div class="flex flex-col gap-2">
-               <button onclick="openVerifyModal()" class="bg-white border border-gray-300 text-gray-800 font-bold py-1.5 rounded-lg text-xs active:bg-gray-50">🔍 Mis Tickets</button>
+      <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm mb-4">
+        <h3 class="text-sm font-black text-gray-800 mb-2 flex items-center gap-1.5" style="font-family:'Space Grotesk',sans-serif;">
+          <span>🔍</span> ¿Ya compraste? Revisa tus números
+        </h3>
+        <div class="flex gap-2">
+          <input type="text" id="inCedulaSearch" class="search-input" placeholder="Ingresa tu Cédula de Identidad" />
+          <button onclick="buscarBoletosPorCedula()" id="btnBuscarCedula" class="btn-primary px-5 shrink-0">Buscar</button>
+        </div>
+        <div id="cedulaResults" class="mt-3 space-y-2"></div>
+        
+        <button onclick="openPremiosModal()" class="w-full mt-3 bg-gradient-to-r from-amber-500 to-orange-400 text-white font-black py-3 rounded-xl shadow-md transition transform active:scale-[0.98] flex items-center justify-center gap-2">
+          <span>🎁</span> Ver Premios del Sorteo
+        </button>
+      </div>
+
+      <div id="mainTicketSection" class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm mb-4">
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-base font-black text-gray-900 flex items-center gap-1.5" style="font-family:'Space Grotesk',sans-serif;">
+            <span>🎟️</span> Elige tus números
+          </h2>
+          <span class="text-xs bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-md">Mínimo: <span id="statMin">2</span></span>
+        </div>
+
+        <div class="bg-rose-50/50 border border-rose-100 p-3 rounded-xl mb-4 flex items-center justify-between gap-3">
+          <div class="text-xs font-bold text-gray-600">
+            ¿Suerte rápida? Elige al azar:
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="flex items-center bg-white border border-rose-200 rounded-lg overflow-hidden">
+              <button id="btnRestarAzar" class="px-2.5 py-1 text-gray-500 hover:bg-gray-100 font-black">-</button>
+              <div id="displayCantidadAzar" class="px-3 font-black text-sm text-gray-800">2</div>
+              <button id="btnSumarAzar" class="px-2.5 py-1 text-gray-500 hover:bg-gray-100 font-black">+</button>
+            </div>
+            <button onclick="randomSelect()" class="bg-gray-900 text-white font-black text-xs px-3 py-2 rounded-lg active:scale-95 transition">
+              🎲 Jugar
+            </button>
+          </div>
+        </div>
+
+        <div id="ticketGrid" class="ticket-grid">
+          </div>
+      </div>
+
+      <div class="bg-white rounded-2xl p-4 border border-rose-100 shadow-sm mb-4">
+        <h3 class="text-sm font-black text-gray-800 mb-3 flex items-center gap-1.5" style="font-family:'Space Grotesk',sans-serif;">
+          <span>👑</span> Lista de Compradores
+        </h3>
+        <div id="buyersList" class="max-h-60 overflow-y-auto pr-1 space-y-2 text-sm text-gray-500">
+          </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="floatingBar" class="floating-bar translate-y-full transition-transform duration-300 shadow-[0_-8px_30px_rgba(225,29,72,0.08)]">
+    <div class="max-w-xl mx-auto p-4 flex items-center justify-between gap-4">
+      <div>
+        <div class="text-xs text-gray-400 font-bold uppercase">Números elegidos</div>
+        <div id="floatingCount" class="text-xl font-black text-rose-600">0 Seleccionados</div>
+      </div>
+      <button onclick="openPayModal()" class="btn-primary px-8 py-3.5 text-sm font-black tracking-wide shrink-0">
+        Reservar Ahora →
+      </button>
+    </div>
+  </div>
+
+  <div id="premiosModal" class="modal-overlay" style="display:none;" onclick="closePremiosModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-black text-gray-900 flex items-center gap-2" style="font-family:'Space Grotesk',sans-serif;">
+          <span>🎁</span> Premios Extraordinarios
+        </h2>
+        <button onclick="closePremiosModal(null)" class="text-gray-400 font-bold text-lg p-1">✕</button>
+      </div>
+
+      <div class="space-y-4 pb-6">
+        <div class="bg-white border-2 border-amber-300 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-amber-400 text-white font-black text-[10px] px-3 py-1 uppercase rounded-bl-xl">
+            1er Premio Principal
+          </div>
+          <div class="flex gap-3 items-start mt-2">
+            <span class="text-3xl">🥇</span>
+            <div>
+              <h3 class="font-black text-gray-900 text-base">Gran Combo del Hogar + Edredón Floral</h3>
+              <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                Incluye una colcha matrimonial de lujo con detalles bordados a mano, un juego completo de sábanas de alta densidad de hilos y almohadas ortopédicas. Este premio está pensado para brindar el máximo confort en tu habitación, garantizando un descanso placentero y un estilo sumamente sofisticado y acogedor.
+              </p>
+              <span class="inline-block mt-2 text-xs bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-md border border-amber-200">
+                🔄 Intercambiable por su valor equivalente
+              </span>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
 
-  <main id="mainTicketSection" class="px-3 pt-4 pb-36" style="display:none;">
-    <div class="grid grid-cols-3 gap-2 mb-4">
-      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
-        <div class="text-xs text-gray-500">Precio</div>
-        <div class="text-sm font-black text-red-600">Bs. <span id="statPrecio">5</span></div>
-      </div>
-      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
-        <div class="text-xs text-gray-500">Mínimo</div>
-        <div class="text-sm font-black text-pink-500"><span id="statMin">2</span> tickets</div>
-      </div>
-      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
-        <div class="text-xs text-gray-500">Disponibles</div>
-        <div class="text-sm font-black text-gray-900" id="statDisp">100</div>
-      </div>
-    </div>
-
-    <div class="bg-white border border-pink-200 rounded-2xl p-4 mb-4 shadow-sm">
-      <div class="flex items-center justify-center mb-4">
-        <div class="text-sm font-black text-red-500 uppercase tracking-widest text-center">🎰 Selección Rápida</div>
-      </div>
-      <div class="flex items-center justify-center gap-4 mb-4">
-        <button id="btnRestarAzar" class="w-12 h-12 rounded-xl bg-pink-100 text-red-500 font-black text-2xl border border-pink-200 active:scale-95 flex items-center justify-center pb-1">-</button>
-        <div class="w-24 h-12 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-xl">
-          <span id="displayCantidadAzar" class="text-2xl font-black text-gray-900">2</span>
+        <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-gray-400 text-white font-black text-[10px] px-3 py-1 uppercase rounded-bl-xl">
+            2do Premio
+          </div>
+          <div class="flex gap-3 items-start mt-2">
+            <span class="text-3xl">🥈</span>
+            <div>
+              <h3 class="font-black text-gray-900 text-base">Set de Cocina Eléctrica de Última Generación</h3>
+              <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                Equipado con tecnología de inducción rápida, controles táctiles digitales y eficiencia energética certificada. Ideal para preparar tus platos favoritos de forma rápida, segura y limpia. Incluye un manual completo de recetas gourmet y garantía extendida por desperfectos técnicos de fábrica.
+              </p>
+            </div>
+          </div>
         </div>
-        <button id="btnSumarAzar" class="w-12 h-12 rounded-xl bg-pink-100 text-red-500 font-black text-2xl border border-pink-200 active:scale-95 flex items-center justify-center pb-1">+</button>
-      </div>
-      <button onclick="randomSelect()" class="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white font-black py-3 rounded-xl shadow-md transform transition active:scale-95 text-sm flex items-center justify-center gap-2">
-        🎲 GENERAR NÚMEROS AL AZAR
-      </button>
-    </div>
 
-    <div class="flex gap-2 mb-3">
-      <input type="text" id="searchInput" class="search-input flex-1 px-4 py-3 text-lg text-center" placeholder="🔍 Buscar número (Ej: 05)" maxlength="2" inputmode="numeric" />
-    </div>
+        <div class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+          <div class="absolute top-0 right-0 bg-amber-700 text-white font-black text-[10px] px-3 py-1 uppercase rounded-bl-xl">
+            3er Premio
+          </div>
+          <div class="flex gap-3 items-start mt-2">
+            <span class="text-3xl">🥉</span>
+            <div>
+              <h3 class="font-black text-gray-900 text-base">Premio Sorpresa de Consuelo</h3>
+              <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                Una maravillosa cesta repleta de productos seleccionados de uso diario y decoraciones florales para amenizar cualquier rincón especial de tu hogar. ¡Nadie se queda por fuera en esta noble causa!
+              </p>
+            </div>
+          </div>
+        </div>
 
-    <div id="ticketGrid" class="ticket-grid mb-3"></div>
-  </main>
-
-  <div class="floating-bar px-4 py-3" id="mainFloatingBar" style="display:none;">
-    <div class="flex items-center gap-3 mb-2">
-      <div class="flex-1">
-        <div class="flex justify-between text-xs mb-1 text-gray-600 font-bold">
-          <span>Seleccionados</span>
-          <span class="font-black text-gray-900" id="countLabel">0 / <span id="minLabel">2</span></span>
+        <div class="bg-rose-50/50 border border-rose-100 rounded-xl p-4 text-xs text-gray-600 space-y-2 leading-relaxed">
+          <p class="font-bold text-rose-800">📋 Términos, Condiciones y Transparencia Legal del Sorteo:</p>
+          <p>
+            1. Todos los fondos recaudados a través de esta plataforma digital van dirigidos exclusivamente a cubrir los gastos logísticos, médicos y de asistencia social a beneficio de Ana Quintero. Agradecemos profundamente cada granito de arena aportado.
+          </p>
+          <p>
+            2. El sorteo oficial se llevará a cabo de manera transparente una vez validados y asignados la totalidad de los 100 números disponibles en la cuadrícula pública. Los resultados se vincularán directamente con los terminales autorizados descritos en las redes oficiales de la organización.
+          </p>
+          <p>
+            3. Para reclamar cualquiera de los premios estipulados, el ganador deberá presentar obligatoriamente el comprobante digital de la transacción que cargó en el formulario, junto con su Cédula de Identidad original laminada para corroborar los datos registrados en el sistema remoto.
+          </p>
+          <p>
+            4. El primer premio de la colcha matrimonial cuenta con la opción exclusiva de ser intercambiable por un artículo alternativo o compensación equivalente acordada previamente con la administración del sorteo, de requerirse por razones logísticas justificados del ganador.
+          </p>
+          <p>
+            5. El periodo para la reclamación física de los premios expira exactamente treinta (30) días continuos después de publicados los resultados del sorteo oficial. Transcurrido dicho plazo sin contacto de los ganadores, los premios serán destinados a una nueva jornada benéfica.
+          </p>
         </div>
       </div>
-      <div class="text-right">
-        <div class="text-xs text-gray-500 font-bold">Total a Pagar</div>
-        <div class="font-black text-red-600 text-lg" id="totalPrice">Bs. 0</div>
+    </div>
+  </div>
+
+  <div id="payModal" class="modal-overlay" style="display:none" onclick="closePayModal()">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+      
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-xl font-black text-gray-900" style="font-family:'Space Grotesk',sans-serif;">
+          Confirmar Reserva 🌸
+        </h2>
+        <button onclick="closePayModal()" class="text-gray-400 font-bold text-lg">✕</button>
       </div>
-    </div>
-    <div class="flex gap-2">
-      <button onclick="clearSelection()" class="btn-outline flex-1 py-3 text-sm">🗑️ Limpiar</button>
-      <button onclick="openPayModal()" id="btnPagar" class="btn-primary flex-1 py-3 text-sm" disabled style="opacity:.4">💳 Pagar</button>
-    </div>
-  </div>
-</div>
+      
+      <div class="flex flex-wrap gap-1.5 mb-4" id="checkoutChips"></div>
 
-<div id="termsModal" class="modal-center" style="display:none">
-  <div class="modal-card">
-    <div class="text-center mb-4">
-      <div class="text-4xl mb-2">🌸</div>
-      <h2 class="text-xl font-black text-gray-900">Ayudemos a Ana</h2>
-      <p class="text-sm text-gray-500 mt-1">Gracias por unirte a esta noble causa.</p>
-    </div>
-    <button onclick="document.getElementById('mainTicketSection').style.display='block'; document.getElementById('mainFloatingBar').style.display='block'; acceptTerms();" class="btn-primary w-full py-4 text-base">✅ Participar ahora</button>
-  </div>
-</div>
+      <div class="bg-white border border-rose-100 p-3 rounded-2xl space-y-2 mb-4 text-xs shadow-sm">
+        <div class="text-rose-800 font-bold uppercase tracking-wider text-[10px]">Datos de Pago Móvil:</div>
+        
+        <div class="flex justify-between items-center bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
+          <div><span class="text-gray-400">Banco:</span> <span class="font-black text-gray-800" id="bnc-val">BNC (0191)</span></div>
+          <button onclick="copyTxt('0191')" class="bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-md text-[10px] active:scale-95 transition">Copiar</button>
+        </div>
 
-<div id="verifyModal" class="modal-overlay" style="display:none">
-  <div class="modal-sheet">
-    <h2 class="text-xl font-black text-gray-900 mb-1">🔍 Mis números</h2>
-    <p class="text-sm text-gray-500 mb-4">Ingresa tu cédula para consultar</p>
-    <div class="flex gap-2 mb-4">
-      <input id="verifyCedula" type="text" class="form-input flex-1" placeholder="Ej: 12345678" />
-      <button onclick="buscarMisBoletos()" id="btnBuscarBoletos" class="btn-primary px-5 py-3 text-sm">Buscar</button>
-    </div>
-    <div id="verifyResults" class="mb-2 max-h-[40vh] overflow-y-auto"></div>
-    <button onclick="closeVerifyModal()" class="btn-outline w-full py-3 mt-1">← Cerrar</button>
-  </div>
-</div>
+        <div class="flex justify-between items-center bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
+          <div><span class="text-gray-400">C.I:</span> <span class="font-black text-gray-800" id="ci-val">27.345.890</span></div>
+          <button onclick="copyTxt('27345890')" class="bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-md text-[10px] active:scale-95 transition">Copiar</button>
+        </div>
 
-<div id="payModal" class="modal-overlay" style="display:none">
-  <div class="modal-sheet">
-    <h2 class="text-xl font-black text-gray-900 mb-1">Confirmar Compra 🎟️</h2>
-    <div class="mb-4">
-      <div class="text-xs font-bold text-gray-500 mb-2">TUS NÚMEROS (00 al 99):</div>
-      <div id="selectedChips" class="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto"></div>
-    </div>
-    <div class="bg-pink-50 p-4 rounded-xl border border-pink-200 mb-4">
-      <div class="text-sm font-black text-red-600 mb-2">💳 PAGO MÓVIL</div>
-      <div class="space-y-1 text-sm text-gray-700">
-        <div class="flex justify-between"><span>Banco:</span><span class="font-bold">Venezuela (0102)</span></div>
-        <div class="flex justify-between"><span>C.I:</span><span class="font-bold">30.522.091</span></div>
-        <div class="flex justify-between"><span>Teléfono:</span><span class="font-bold">0414-4708220</span></div>
-        <div class="border-t border-pink-200 pt-2 mt-2 flex justify-between"><span class="font-bold">Total:</span><span class="font-black text-lg text-red-600" id="modalTotal">Bs. 0</span></div>
+        <div class="flex justify-between items-center bg-rose-50/50 p-2.5 rounded-xl border border-rose-100/50">
+          <div><span class="text-gray-400">Teléfono:</span> <span class="font-black text-gray-800" id="telf-val">0412-5556677</span></div>
+          <button onclick="copyTxt('04125556677')" class="bg-rose-100 text-rose-700 font-bold px-2 py-1 rounded-md text-[10px] active:scale-95 transition">Copiar</button>
+        </div>
+
+        <div class="pt-1 text-center font-bold text-rose-600 text-sm">
+          Monto Total: <span id="checkoutMonto" class="text-lg font-black">0</span>$
+        </div>
       </div>
+
+      <form id="payForm" onsubmit="handlePaySubmit(event)" class="space-y-3 pb-4">
+        <input type="text" id="fNombre" class="form-input" placeholder="Nombre y Apellido" required />
+        <input type="text" id="fCedula" class="form-input" placeholder="Cédula de Identidad" required />
+        <input type="tel" id="fTelefono" class="form-input" placeholder="Número de Teléfono" required />
+        <input type="text" id="fReferencia" class="form-input" placeholder="Últimos 4 dígitos de Referencia" required />
+        
+        <label class="block border-2 border-dashed border-rose-200 p-4 rounded-xl text-center cursor-pointer bg-white">
+          <span id="uploadText" class="text-sm font-bold text-gray-500">📷 Subir Capture de Pago</span>
+          <input type="file" id="fCapture" accept="image/*" class="hidden" onchange="previewCapture(this)" required />
+        </label>
+        <img id="capturePreview" class="w-full mt-2 hidden max-h-40 object-cover rounded-xl border border-gray-200" />
+        
+        <button type="submit" class="btn-primary w-full py-4 text-base">🚀 Enviar Validación</button>
+      </form>
     </div>
-    <form id="payForm" onsubmit="submitOrder(event)" class="space-y-3">
-      <input type="text" id="fNombre" class="form-input" placeholder="👤 Nombre Completo *" required />
-      <input type="text" id="fCedula" class="form-input" placeholder="🪪 Cédula *" required />
-      <input type="tel" id="fWhatsapp" class="form-input" placeholder="📱 WhatsApp *" required />
-      <input type="text" id="fRef" class="form-input text-center tracking-widest" placeholder="🔢 6 últimos dígitos ref *" required maxlength="6" minlength="6" />
-      <label class="block border-2 border-dashed border-pink-300 p-4 rounded-xl text-center cursor-pointer bg-white">
-        <span id="uploadText" class="text-sm font-bold text-gray-500">📷 Subir Capture</span>
-        <input type="file" id="fCapture" accept="image/*" class="hidden" onchange="previewCapture(this)" required />
-      </label>
-      <img id="capturePreview" class="w-full mt-2 hidden max-h-40 object-cover rounded-xl border border-gray-200" />
-      <button type="submit" class="btn-primary w-full py-4 text-base">🚀 Enviar Reserva</button>
-      <button type="button" onclick="closePayModal()" class="btn-outline w-full py-3">← Volver</button>
-    </form>
   </div>
-</div>
 
-<div id="successModal" class="modal-overlay" style="display:none">
-  <div class="modal-sheet text-center">
-    <div class="text-6xl mb-3">🌸</div>
-    <h2 class="text-2xl font-black text-gray-900 mb-1">¡Gracias por ayudar!</h2>
-    <p class="text-gray-500 text-sm mb-4">Tu reserva fue registrada y pronto será confirmada.</p>
-    <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-4 text-left" id="successSummary"></div>
-    <button onclick="goVIP()" class="btn-primary w-full py-3 text-sm mb-2">📲 Ir al grupo VIP de la Rifa</button>
-    <button onclick="closeSuccessModal()" class="btn-outline w-full py-3 text-sm">✅ Cerrar</button>
+  <div id="successModal" class="modal-overlay" style="display:none">
+    <div class="modal-sheet text-center">
+      <div class="text-6xl mb-3">🌸</div>
+      <h2 class="text-2xl font-black text-gray-900 mb-1">¡Reserva Registrada!</h2>
+      <p class="text-gray-500 text-sm mb-4">Estamos validando tu transacción en el panel central.</p>
+      <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-4 text-left text-xs space-y-1" id="successSummary"></div>
+      
+      <div class="flex flex-col items-center justify-center my-4 relative">
+        <div class="w-20 h-20 rounded-full border-4 border-rose-100 flex items-center justify-center">
+          <span id="cdNum" class="text-2xl font-black text-rose-600">3</span>
+        </div>
+        <p class="text-xs font-bold text-gray-400 mt-2">Redireccionando al grupo VIP...</p>
+      </div>
+
+      <button onclick="goVIP()" class="btn-primary w-full py-4">Ingresar de Inmediato al WhatsApp →</button>
+    </div>
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="config.js?v=2"></script>
-<script src="app.js?v=5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="credentials.js"></script>
+  <script src="app.js"></script>
+
+  <script>
+    /* ══ LÓGICA DE CONTROL LOCAL DE VENTANAS MODALES DE PREMIOS ══ */
+    function openPremiosModal() {
+      document.getElementById('premiosModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function closePremiosModal(e) {
+      document.getElementById('premiosModal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    function copyTxt(text) {
+      navigator.clipboard.writeText(text);
+      showToast("📋 ¡Copiado con éxito!");
+    }
+    
+    // Inyección del enlace dinámico del flyer al cargar
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const { data } = await db.from('landing_config').select('flyer_url').eq('id', 'main').single();
+        if(data && data.flyer_url) {
+          document.getElementById('imgFlyer').src = data.flyer_url;
+        }
+      } catch(err) { console.log("Carga de flyer remota offline, usando respaldo local."); }
+    });
+  </script>
 </body>
 </html>
