@@ -28,12 +28,6 @@
       pointer-events: none; z-index: 0;
     }
     .content { position: relative; z-index: 1; }
-    .neon-glass {
-      background: var(--glass);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 10px 30px rgba(244, 63, 94, 0.04);
-    }
     .btn-primary {
       background: linear-gradient(135deg, var(--rose) 0%, #FDA4AF 100%);
       color: #fff; font-weight: 900; border-radius: 20px;
@@ -64,7 +58,7 @@
 <body>
 <div class="content min-h-screen flex flex-col justify-between pb-8">
 
-  <!-- HERO HEADER -->
+  <!-- HERO HEADER (FLYER REAL DE TU DISEÑO) -->
   <div class="relative w-full bg-gray-50 border-b border-gray-100 shadow-sm">
     <img id="landingFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando+Sorteo..." class="w-full aspect-[4/5] object-cover" alt="Sorteo Ana">
     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-6">
@@ -103,7 +97,7 @@
     </div>
   </div>
 
-  <!-- DATOS DE PAGO MÓVIL OFICIALES (FIJOS EN HOME) -->
+  <!-- DATOS DE PAGO MÓVIL OFICIALES -->
   <div class="px-6 max-w-md mx-auto w-full">
     <div class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm border-t-4 border-t-rose-400">
       <div class="text-xs font-black text-rose-500 mb-4 tracking-wider uppercase flex items-center gap-1.5">
@@ -128,7 +122,7 @@
 
 </div>
 
-<!-- MODAL DESPLEGABLE: PREMIOS DEL SORTEO (IMÁGENES ADAPTABLES) -->
+<!-- MODAL DESPLEGABLE: PREMIOS DEL SORTEO -->
 <div id="premiosModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
     <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
@@ -138,7 +132,6 @@
       <button onclick="closePremiosModal()" class="text-gray-400 text-xl font-bold p-1">✕</button>
     </div>
 
-    <!-- Lista Dinámica de Premios -->
     <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-1" id="listaPremiosContenedor">
       <!-- Premio 1 -->
       <div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4">
@@ -197,10 +190,9 @@
   
   function copyText(txt) {
     navigator.clipboard.writeText(txt);
-    alert("Copiado al portapapeles: " + txt);
+    alert("Copiado: " + txt);
   }
 
-  // Inicialización básica y carga de config de Supabase
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
@@ -208,7 +200,6 @@
         if(config.flyer_url) document.getElementById('landingFlyerImg').src = config.flyer_url;
         if(config.mensaje) document.getElementById('landingMsgText').textContent = config.mensaje;
         
-        // Mapeo de premios si vienen desde base de datos
         if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
         if(config.premio1_img) {
           document.getElementById('imgPremio1').src = config.premio1_img;
@@ -229,7 +220,6 @@
         }
       }
 
-      // Calcular barra de progreso real basada en 100 tickets totales
       const { data: tkts } = await db.from('tickets_v2').select('status');
       if(tkts) {
         const vendidos = tkts.filter(t => t.status === 'vendido' || t.status === 'apartado').length;
