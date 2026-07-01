@@ -3,290 +3,635 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Rifa a Beneficio de Ana Quintero 🌸</title>
+  <title>Rifa Ana — Adquirir Tickets 🎟️</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --primary: #E11D48; /* Rojo Vibrante */
-      --primary-light: #FB7185; /* Rosado */
-      --primary-dark: #BE123C;
-      --bg: #FFF5F7; /* Blanco Rosado muy suave */
-      --surface: #FFFFFF;
-      --surface2: #FFE4E6;
+      --rose: #F43F5E;
+      --rose-light: #FDA4AF;
+      --rose-dark: #BE123C;
+      --bg: #FFFFFF;
+      --glass: rgba(255, 255, 255, 0.5);
+      --glass-border: rgba(255, 255, 255, 0.7);
       --text: #1F2937;
-      --text-muted: #4B5563;
+      --text-muted: #6B7280;
     }
-    * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
-      font-family:'Nunito',sans-serif;
-      background:var(--bg); color:var(--text);
-      min-height:100vh; overflow-x:hidden;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; overflow-x: hidden;
+      position: relative;
     }
-    
-    /* Decoración de Flores */
-    .floral-deco { position: fixed; font-size: 28px; opacity: 0.8; z-index: 0; pointer-events: none; }
-    .f-1 { top: 15px; left: 15px; }
-    .f-2 { top: 40px; right: 20px; font-size: 35px; }
-    .f-3 { bottom: 80px; left: 20px; }
-    .f-4 { bottom: 30px; right: 15px; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: 
+        radial-gradient(circle at 10% 10%, rgba(255, 241, 242, 0.8) 0%, transparent 50%),
+        radial-gradient(circle at 90% 90%, rgba(244, 63, 94, 0.06) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    .content { position: relative; z-index: 1; }
 
-    .content { position:relative; z-index:1; }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* ══ ESTILOS TICKET GRID (BLANCO, NEGRO, SOLIDO) ══ */
-    .ticket-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; }
-    @media(min-width:400px){ .ticket-grid{ grid-template-columns:repeat(10,1fr); gap:6px; } }
+    /* Neon Glass Blanco */
+    .neon-glass {
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(120%);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px 0 rgba(244, 63, 94, 0.05), inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    /* ══ GRID DE NUMERACIÓN (Bordes Negros para Máximo Contraste) ══ */
+    .ticket-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    @media(min-width:400px){ .ticket-grid { grid-template-columns: repeat(6, 1fr); gap: 7px; } }
+    @media(min-width:640px){ .ticket-grid { grid-template-columns: repeat(8, 1fr); gap: 8px; } }
+    
     .ticket {
-      aspect-ratio:1; display:flex; align-items:center; justify-content:center;
-      border-radius:8px; font-size:14px; font-weight:900; cursor:pointer;
-      transition:transform .15s, box-shadow .15s;
-      user-select:none; position:relative; overflow:hidden;
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      border-radius: 12px; font-size: 13px; font-weight: 900; cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+      border: 1.5px solid #000000; user-select: none; position: relative; overflow: hidden;
     }
+    @media(min-width:400px){ .ticket { font-size: 14px; } }
     
-    /* BOLETO DISPONIBLE - Exactamente como lo pediste */
     .ticket-available {
-      background: #FFFFFF !important;
-      border: 2px solid #000000 !important;
-      color: #000000 !important;
-      box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+      background: #FFFFFF; color: #000000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-    .ticket-available:active { transform:scale(.9); }
+    .ticket-available:active { transform: scale(.9); }
     
-    /* BOLETO SELECCIONADO */
     .ticket-selected {
-      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-      border: 2px solid #9F1239 !important;
-      color: #FFFFFF !important;
-      box-shadow: 0 4px 15px rgba(225,29,72,.4); transform:scale(1.05);
+      background: linear-gradient(135deg, #F43F5E 0%, #FDA4AF 100%);
+      border-color: #000000; color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(244, 63, 94, 0.35); transform: scale(1.05);
     }
-    .ticket-selected::after { content:'✓'; position:absolute; top:2px; right:3px; font-size:10px; opacity:1; color:white; }
+    .ticket-selected::after { content: '✓'; position: absolute; top: 1px; right: 3px; font-size: 9px; font-weight:900; opacity: .9; color: #fff; }
 
     /* ══ INPUTS ══ */
-    .search-input, .form-input {
-      background:#FFFFFF; border:2px solid #FECDD3;
-      border-radius:12px; color:#1F2937; outline:none; transition:border-color .2s; width: 100%;
-      padding:12px; font-weight:700;
+    .search-input {
+      background: rgba(255,255,255,0.9); border: 2px solid #E5E7EB;
+      border-radius: 14px; color: #1F2937; outline: none; transition: border-color .2s, box-shadow .2s;
     }
-    .search-input:focus, .form-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(225,29,72,.1); }
-    .search-input::placeholder, .form-input::placeholder { color:#9CA3AF; }
+    .search-input:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15); }
+    .search-input::placeholder { color: #9CA3AF; }
+    
+    .form-input {
+      background: #FFFFFF; border: 2px solid #E5E7EB;
+      border-radius: 14px; color: #1F2937; outline: none; width: 100%;
+      font-family: 'Nunito', sans-serif; transition: border-color .2s, box-shadow .2s;
+    }
+    .form-input:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15); }
 
-    /* ══ BUTTONS ══ */
+    /* ══ BOTONES INTERFAZ ══ */
     .btn-primary {
-      background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
-      border:none; color:#fff; font-weight:900; border-radius:14px; cursor:pointer;
-      transition:transform .15s; box-shadow:0 4px 20px rgba(225,29,72,.3);
+      background: linear-gradient(135deg, var(--rose) 0%, #FDA4AF 100%);
+      border: none; color: #fff; font-weight: 900; border-radius: 16px; cursor: pointer;
+      transition: transform .15s; box-shadow: 0 6px 20px rgba(244, 63, 94, 0.25);
     }
-    .btn-primary:active { transform:scale(.97); }
+    .btn-primary:active { transform: scale(.97); }
+    
+    .btn-teal {
+      background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+      border: none; color: #fff; font-weight: 900; border-radius: 16px; cursor: pointer;
+      transition: transform .15s; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+    }
+    .btn-teal:active { transform: scale(.97); }
+    
     .btn-outline {
-      background:#FFFFFF; border:2px solid var(--primary-light);
-      color:var(--primary-dark); font-weight:800; border-radius:14px; cursor:pointer;
+      background: #FFFFFF; border: 2px solid #E5E7EB;
+      color: #4B5563; font-weight: 700; border-radius: 16px; cursor: pointer;
+      transition: all .15s;
     }
+    .btn-outline:active { background: #F9FAFB; }
 
-    /* ══ FLOATING BAR ══ */
+    /* ══ FLOATING NAVIGATION BAR ══ */
     .floating-bar {
-      position:fixed; bottom:0; left:0; right:0;
-      background:rgba(255,255,255,.95); border-top:2px solid #FECDD3;
-      backdrop-filter:blur(20px); z-index:100; padding-bottom:env(safe-area-inset-bottom);
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255, 255, 255, 0.9); border-top: 1px solid rgba(244, 63, 94, 0.15);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.04);
     }
+    .page-btn {
+      background: #FFFFFF; border: 2px solid #E5E7EB;
+      border-radius: 12px; color: #4B5563;
+      padding: 8px 14px; cursor: pointer; font-weight: 700; font-size: 13px;
+    }
+    .page-btn:disabled { opacity: .4; cursor: not-allowed; }
 
-    /* ══ MODALS ══ */
+    /* ══ MODALES ══ */
     .modal-overlay {
-      position:fixed; inset:0; background:rgba(0,0,0,.6);
-      backdrop-filter:blur(4px); z-index:200; display:flex; align-items:flex-end;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200;
+      display: flex; align-items: flex-end; animation: fadeIn .2s ease;
     }
     .modal-sheet {
-      width:100%; background:var(--bg); border-top-left-radius:28px; border-top-right-radius:28px;
-      max-height:92vh; overflow-y:auto; padding: 20px;
+      width: 100%; background: #FFFFFF;
+      border-top-left-radius: 28px; border-top-right-radius: 28px;
+      border-top: 1px solid rgba(244, 63, 94, 0.1);
+      max-height: 92vh; overflow-y: auto;
+      animation: slideUp .3s cubic-bezier(.34,1.56,.64,1);
     }
     .modal-center {
-      position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:400;
-      display:flex; align-items:center; justify-content:center; padding:16px;
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px); z-index: 400;
+      display: flex; align-items: center; justify-content: center; padding: 16px;
     }
-    .modal-card { background:#FFFFFF; border-radius:24px; width:100%; max-width:440px; padding: 20px; }
+    .modal-card {
+      background: #FFFFFF; border: 1px solid rgba(244, 63, 94, 0.1);
+      border-radius: 28px; width: 100%; max-width: 440px; max-height: 90vh;
+      overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
 
-    /* Chips */
+    .terms-item {
+      display: flex; gap: 10px; padding: 12px;
+      background: #F9FAFB; border-radius: 14px;
+      border: 1px solid #E5E7EB; margin-bottom: 8px;
+    }
+
+    /* Contador circular */
+    .cd-ring {
+      width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 12px;
+      background: conic-gradient(#10B981 var(--pct,0%), #F3F4F6 0%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cd-inner {
+      width: 48px; height: 48px; border-radius: 50%; background: #FFFFFF;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900; color: #10B981;
+    }
+
+    /* Cuadros de checkout */
+    .upload-area {
+      border: 2px dashed #D1D5DB; border-radius: 16px;
+      background: #F9FAFB; cursor: pointer; transition: all .2s;
+    }
+    .upload-area:active { border-color: var(--rose); background: #FFF1F2; }
+    .payment-box {
+      background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+      border: 1px solid #FECDD3; border-radius: 20px;
+    }
     .selected-chip {
-      background:var(--surface2); border:1px solid var(--primary-light);
-      border-radius:8px; padding:4px 10px; font-size:14px; font-weight:900; color:var(--primary-dark);
+      background: #FFF1F2; border: 1px solid #FCA5A5;
+      border-radius: 8px; padding: 4px 10px; font-size: 12px; font-weight: 800; color: var(--rose);
+    }
+    .vr-card { border-radius: 16px; padding: 14px; margin-bottom: 10px; border: 1px solid #E5E7EB; background: #FAFAFA; }
+    .vr-num {
+      background: #FFF1F2; border: 1px solid #FCA5A5;
+      border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 900;
+      color: var(--rose); display: inline-block; margin: 2px;
+    }
+
+    .copy-btn { color: var(--rose); font-size: 13px; opacity: .8; cursor: pointer; vertical-align: middle; }
+    .wa-support {
+      position: fixed; bottom: 122px; right: 16px; z-index: 150;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.3); text-decoration: none;
+    }
+    .toast {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      background: #1F2937; color: #fff; border-radius: 14px; padding: 12px 24px;
+      font-weight: 700; font-size: 14px; z-index: 9999; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
-
-<div class="floral-deco f-1">🌸</div>
-<div class="floral-deco f-2">🌺</div>
-<div class="floral-deco f-3">🌸</div>
-<div class="floral-deco f-4">🌺</div>
-
 <div class="content">
-  <div class="carousel-wrapper relative w-full overflow-hidden bg-white shadow-sm" id="headerCarousel">
+
+  <!-- TOP DE ENTRADA / HERO SLIDER -->
+  <div class="carousel-wrapper relative w-full overflow-hidden bg-gray-50 border-b border-gray-100 shadow-sm" id="headerCarousel">
     <div id="mainCarousel" class="flex overflow-x-auto snap-x snap-mandatory scroll-smooth hide-scrollbar">
+      
       <div class="min-w-full snap-center relative">
-        <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover" alt="Sorteo Actual">
-        <div class="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent flex flex-col justify-end p-4 pb-8">
+        <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover" alt="Sorteo">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-4 pb-8">
           
           <div class="flex items-center gap-2 mb-2">
-            <span class="bg-red-500 rounded-full w-3 h-3 animate-pulse"></span>
-            <span class="text-xs font-black text-red-600 tracking-widest uppercase">GRAN RIFA</span>
+            <span class="bg-rose-500 rounded-full w-2.5 h-2.5 animate-pulse"></span>
+            <span class="text-xs font-black text-rose-400 tracking-widest uppercase">SORTEO EN MARCHA</span>
           </div>
 
-          <h2 id="activeMsgText" class="text-2xl font-black text-gray-900 mb-3">Rifa a Beneficio de Ana Quintero 🌸</h2>
+          <h2 id="activeMsgText" class="text-2xl font-black text-white drop-shadow-md mb-3">Sincronizando detalles...</h2>
           
-          <div class="w-full mb-4 bg-white/90 backdrop-blur-md border border-pink-200 p-3 rounded-xl shadow-md">
+          <div class="w-full mb-4 bg-white/15 backdrop-blur-md border border-white/20 p-3 rounded-2xl shadow-xl">
              <div class="flex justify-between items-center mb-1">
-               <span class="text-xs text-gray-600 font-bold">Progreso de Ventas</span>
-               <span class="text-xs font-black text-red-500" id="salesPct">0%</span>
+               <span class="text-xs text-gray-100 font-bold">Progreso Global</span>
+               <span class="text-xs font-black text-rose-300" id="salesPct">0%</span>
              </div>
-             <div class="bg-gray-200 h-3 rounded-full overflow-hidden mb-1">
-               <div class="bg-gradient-to-r from-pink-400 to-red-500 h-full transition-all duration-700" id="salesFill" style="width:0%"></div>
+             <div class="bg-black/20 h-2 rounded-full overflow-hidden mb-1">
+               <div class="bg-gradient-to-r from-rose-500 to-pink-300 h-full transition-all duration-700" id="salesFill" style="width:0%"></div>
              </div>
-             <div class="flex justify-between">
-               <span class="text-[10px] font-black text-red-600" id="salesSold">0</span>
-               <span class="text-[10px] text-gray-500"><span id="salesRem">100</span> restantes</span>
+             <div class="flex justify-between text-white/80">
+               <span class="text-[10px] font-black text-rose-300" id="salesSold">0</span>
+               <span class="text-[10px]"><span id="salesRem">100</span> disponibles</span>
              </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="comenzarCompra()" class="bg-gradient-to-r from-red-600 to-pink-500 text-white font-black py-3 rounded-xl shadow-lg transform transition active:scale-95 text-sm">💳 COMPRAR NÚMEROS</button>
-            <div class="flex flex-col gap-2">
-               <button onclick="openVerifyModal()" class="bg-white border border-gray-300 text-gray-800 font-bold py-1.5 rounded-lg text-xs active:bg-gray-50">🔍 Mis Tickets</button>
+            <button onclick="comenzarCompra()" class="btn-primary py-3.5 text-sm font-black tracking-wide">🎟️ COMPRAR TICKETS</button>
+            <div class="flex flex-col gap-1.5">
+               <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-1.5 rounded-xl text-xs backdrop-blur-sm active:bg-white/30">🔍 Mis Tickets</button>
+               <button onclick="abrirTopTenLive()" class="bg-amber-500/30 border border-amber-500/50 text-amber-300 font-bold py-1.5 rounded-xl text-xs backdrop-blur-sm active:bg-amber-500/40">🏆 Top Compras</button>
             </div>
           </div>
         </div>
       </div>
     </div>
+    
+    <button id="btnCarPrev" onclick="scrollCarousel(-1)" class="hidden absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 text-gray-800 w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 z-10 text-base font-bold">❮</button>
+    <button id="btnCarNext" onclick="scrollCarousel(1)" class="hidden absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 text-gray-800 w-9 h-9 flex items-center justify-center rounded-full border border-gray-200 z-10 text-base font-bold">❯</button>
   </div>
 
-  <main id="mainTicketSection" class="px-3 pt-4 pb-36" style="display:none;">
-    <div class="grid grid-cols-3 gap-2 mb-4">
-      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
-        <div class="text-xs text-gray-500">Precio</div>
-        <div class="text-sm font-black text-red-600">Bs. <span id="statPrecio">5</span></div>
+  <!-- SECCIÓN PRINCIPAL DE INTERACCIÓN -->
+  <main id="mainTicketSection" class="px-4 pt-5 pb-36" style="display:none;">
+
+    <!-- PANEL DE ESTADÍSTICAS -->
+    <div class="grid grid-cols-3 gap-2.5 mb-5">
+      <div class="bg-white border border-gray-200 rounded-2xl p-2.5 text-center shadow-sm">
+        <div class="text-[11px] font-bold text-gray-400 uppercase">Precio</div>
+        <div class="text-sm font-black text-rose-600">Bs. <span id="statPrecio">5</span></div>
       </div>
-      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
-        <div class="text-xs text-gray-500">Mínimo</div>
-        <div class="text-sm font-black text-pink-500"><span id="statMin">2</span> tickets</div>
+      <div class="bg-white border border-gray-200 rounded-2xl p-2.5 text-center shadow-sm">
+        <div class="text-[11px] font-bold text-gray-400 uppercase">Mínimo</div>
+        <div class="text-sm font-black text-gray-700"><span id="statMin">20</span> pcs</div>
       </div>
-      <div class="bg-white border border-pink-100 rounded-xl p-2 text-center shadow-sm">
-        <div class="text-xs text-gray-500">Disponibles</div>
-        <div class="text-sm font-black text-gray-900" id="statDisp">100</div>
+      <div class="bg-white border border-gray-200 rounded-2xl p-2.5 text-center shadow-sm">
+        <div class="text-[11px] font-bold text-gray-400 uppercase">Disponibles</div>
+        <div class="text-sm font-black text-emerald-600" id="statDisp">100</div>
       </div>
     </div>
 
-    <div class="bg-white border border-pink-200 rounded-2xl p-4 mb-4 shadow-sm">
-      <div class="flex items-center justify-center mb-4">
-        <div class="text-sm font-black text-red-500 uppercase tracking-widest text-center">🎰 Selección Rápida</div>
-      </div>
-      <div class="flex items-center justify-center gap-4 mb-4">
-        <button id="btnRestarAzar" class="w-12 h-12 rounded-xl bg-pink-100 text-red-500 font-black text-2xl border border-pink-200 active:scale-95 flex items-center justify-center pb-1">-</button>
-        <div class="w-24 h-12 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-xl">
-          <span id="displayCantidadAzar" class="text-2xl font-black text-gray-900">2</span>
+    <!-- SELECCIÓN AL AZAR -->
+    <div class="bg-white border border-gray-200 rounded-3xl p-4 mb-5 shadow-sm">
+      <div class="text-xs font-black text-center text-rose-500 uppercase tracking-widest mb-3">🎲 Generación por Azar</div>
+      
+      <div class="flex items-center justify-center gap-4 mb-3">
+        <button id="btnRestarAzar" class="w-11 h-11 rounded-xl bg-gray-100 text-gray-600 font-black text-xl border border-gray-200 active:scale-95 transition-transform flex items-center justify-center">-</button>
+        <div class="w-20 h-11 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-xl">
+          <span id="displayCantidadAzar" class="text-xl font-black text-gray-800">20</span>
         </div>
-        <button id="btnSumarAzar" class="w-12 h-12 rounded-xl bg-pink-100 text-red-500 font-black text-2xl border border-pink-200 active:scale-95 flex items-center justify-center pb-1">+</button>
+        <button id="btnSumarAzar" class="w-11 h-11 rounded-xl bg-gray-100 text-gray-600 font-black text-xl border border-gray-200 active:scale-95 transition-transform flex items-center justify-center">+</button>
       </div>
-      <button onclick="randomSelect()" class="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white font-black py-3 rounded-xl shadow-md transform transition active:scale-95 text-sm flex items-center justify-center gap-2">
-        🎲 GENERAR NÚMEROS AL AZAR
+
+      <button onclick="randomSelect()" class="w-full bg-gray-900 text-white font-bold py-3 rounded-xl transform transition active:scale-95 text-xs tracking-wider">
+        COMPLETAR SELECCIÓN AL AZAR
       </button>
     </div>
 
-    <div class="flex gap-2 mb-3">
-      <input type="text" id="searchInput" class="search-input flex-1 px-4 py-3 text-lg text-center" placeholder="🔍 Buscar número (Ej: 05)" maxlength="2" inputmode="numeric" />
+    <!-- BUSCADOR MANUAL -->
+    <div class="flex gap-2 mb-4">
+      <input type="text" id="searchInput"
+        class="search-input flex-1 px-4 py-3 text-sm font-black text-center tracking-widest text-gray-800 uppercase"
+        placeholder="🔎 DIGITA UN NÚMERO MANUAL..." maxlength="4" inputmode="numeric" />
     </div>
 
-    <div id="ticketGrid" class="ticket-grid mb-3"></div>
+    <!-- LEYENDA -->
+    <div class="flex gap-4 mb-4 justify-center">
+      <div class="flex items-center gap-1.5">
+        <div style="width:14px;height:14px;border-radius:4px;background:#FFFFFF;border:1.5px solid #000;"></div>
+        <span class="text-xs text-gray-500 font-bold">Disponible</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <div style="width:14px;height:14px;border-radius:4px;background:linear-gradient(135deg,#F43F5E,#FDA4AF);border:1.5px solid #000;"></div>
+        <span class="text-xs text-gray-500 font-bold">Seleccionado</span>
+      </div>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="flex items-center justify-between mb-4">
+      <button id="btnPrev" class="page-btn" onclick="changePage(-1)">← Ant.</button>
+      <div class="text-center">
+        <div class="text-[10px] font-bold text-gray-400 uppercase">Sección</div>
+        <div class="font-black text-sm text-gray-800" id="pageIndicator">1 / 1</div>
+      </div>
+      <button id="btnNext" class="page-btn" onclick="changePage(1)">Sig. →</button>
+    </div>
+
+    <!-- REJILLA DE NÚMEROS (TICKETS CON BORDE NEGRO DE TU DISEÑO ORIGINAL) -->
+    <div id="ticketGrid" class="ticket-grid mb-5"></div>
+
+    <!-- SALTO DE PÁGINA RÁPIDO -->
+    <div class="flex gap-2 items-center justify-center">
+      <span class="text-xs font-bold text-gray-400">Ir a pág:</span>
+      <input type="number" id="pageJump" min="1" max="1" class="search-input px-3 py-1.5 text-xs w-20 text-center" inputmode="numeric" placeholder="1" />
+      <button onclick="jumpToPage()" class="btn-outline px-3 py-1.5 text-xs font-bold">Saltar</button>
+    </div>
+
   </main>
 
+  <!-- BARRA DE COMPRA INFERIOR FLOTANTE -->
   <div class="floating-bar px-4 py-3" id="mainFloatingBar" style="display:none;">
     <div class="flex items-center gap-3 mb-2">
       <div class="flex-1">
-        <div class="flex justify-between text-xs mb-1 text-gray-600 font-bold">
-          <span>Seleccionados</span>
-          <span class="font-black text-gray-900" id="countLabel">0 / <span id="minLabel">2</span></span>
+        <div class="flex justify-between text-xs mb-1">
+          <span class="text-gray-500 font-bold">Elegidos</span>
+          <span class="font-black text-gray-800" id="countLabel">0 / <span id="minLabel">20</span></span>
+        </div>
+        <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div id="progressBar" class="h-full rounded-full transition-all duration-300" style="width:0%; background: #F43F5E;"></div>
         </div>
       </div>
       <div class="text-right">
-        <div class="text-xs text-gray-500 font-bold">Total a Pagar</div>
-        <div class="font-black text-red-600 text-lg" id="totalPrice">Bs. 0</div>
+        <div class="text-[11px] font-bold text-gray-400">Total</div>
+        <div class="font-black text-rose-600 text-base" id="totalPrice">Bs. 0</div>
       </div>
     </div>
     <div class="flex gap-2">
-      <button onclick="clearSelection()" class="btn-outline flex-1 py-3 text-sm">🗑️ Limpiar</button>
-      <button onclick="openPayModal()" id="btnPagar" class="btn-primary flex-1 py-3 text-sm" disabled style="opacity:.4">💳 Pagar</button>
+      <button onclick="clearSelection()" class="btn-outline flex-1 py-2.5 text-xs font-bold">🗑️ Limpiar Todo</button>
+      <button onclick="openPayModal()" id="btnPagar" class="btn-primary flex-1 py-2.5 text-xs font-black tracking-wide" disabled style="opacity:.4">
+        💳 Procesar Pago
+      </button>
     </div>
   </div>
+
 </div>
 
+<!-- SOPORTE WHATSAPP -->
+<a href="https://wa.me/584269395786" target="_blank" class="wa-support" title="Soporte Técnico">
+  <svg viewBox="0 0 24 24" width="26" height="26" fill="#fff">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+</a>
+
+<!-- MODAL: TERMINOS -->
 <div id="termsModal" class="modal-center" style="display:none">
-  <div class="modal-card">
+  <div class="modal-card p-6">
     <div class="text-center mb-4">
-      <div class="text-4xl mb-2">🌸</div>
-      <h2 class="text-xl font-black text-gray-900">Ayudemos a Ana</h2>
-      <p class="text-sm text-gray-500 mt-1">Gracias por unirte a esta noble causa.</p>
+      <div class="text-3xl mb-1">🌸</div>
+      <h2 class="text-xl font-black text-gray-900">Términos del Sorteo</h2>
+      <p class="text-xs text-gray-400 mt-1">Rifa Ana — Por favor confirma para continuar</p>
     </div>
-    <button onclick="document.getElementById('mainTicketSection').style.display='block'; document.getElementById('mainFloatingBar').style.display='block'; acceptTerms();" class="btn-primary w-full py-4 text-base">✅ Participar ahora</button>
-  </div>
-</div>
-
-<div id="verifyModal" class="modal-overlay" style="display:none">
-  <div class="modal-sheet">
-    <h2 class="text-xl font-black text-gray-900 mb-1">🔍 Mis números</h2>
-    <p class="text-sm text-gray-500 mb-4">Ingresa tu cédula para consultar</p>
-    <div class="flex gap-2 mb-4">
-      <input id="verifyCedula" type="text" class="form-input flex-1" placeholder="Ej: 12345678" />
-      <button onclick="buscarMisBoletos()" id="btnBuscarBoletos" class="btn-primary px-5 py-3 text-sm">Buscar</button>
-    </div>
-    <div id="verifyResults" class="mb-2 max-h-[40vh] overflow-y-auto"></div>
-    <button onclick="closeVerifyModal()" class="btn-outline w-full py-3 mt-1">← Cerrar</button>
-  </div>
-</div>
-
-<div id="payModal" class="modal-overlay" style="display:none">
-  <div class="modal-sheet">
-    <h2 class="text-xl font-black text-gray-900 mb-1">Confirmar Compra 🎟️</h2>
-    <div class="mb-4">
-      <div class="text-xs font-bold text-gray-500 mb-2">TUS NÚMEROS (00 al 99):</div>
-      <div id="selectedChips" class="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto"></div>
-    </div>
-    <div class="bg-pink-50 p-4 rounded-xl border border-pink-200 mb-4">
-      <div class="text-sm font-black text-red-600 mb-2">💳 PAGO MÓVIL</div>
-      <div class="space-y-1 text-sm text-gray-700">
-        <div class="flex justify-between"><span>Banco:</span><span class="font-bold">Venezuela (0102)</span></div>
-        <div class="flex justify-between"><span>C.I:</span><span class="font-bold">30.522.091</span></div>
-        <div class="flex justify-between"><span>Teléfono:</span><span class="font-bold">0414-4708220</span></div>
-        <div class="border-t border-pink-200 pt-2 mt-2 flex justify-between"><span class="font-bold">Total:</span><span class="font-black text-lg text-red-600" id="modalTotal">Bs. 0</span></div>
+    <div class="mb-5 space-y-2">
+      <div class="terms-item">
+        <span class="terms-icon">🔞</span>
+        <div>
+          <div class="text-xs font-black text-gray-800">Participación Legal</div>
+          <div class="text-[11px] text-gray-500 mt-0.5">Válido exclusivamente para personas mayores de edad con residencia verificable.</div>
+        </div>
+      </div>
+      <div class="terms-item">
+        <span class="terms-icon">🎟️</span>
+        <div>
+          <div class="text-xs font-black text-gray-800">Validación de Reportes</div>
+          <div class="text-[11px] text-gray-500 mt-0.5">El administrador auditará los últimos 6 dígitos en un período no mayor a 12 horas.</div>
+        </div>
       </div>
     </div>
+    <button onclick="document.getElementById('mainTicketSection').style.display='block'; document.getElementById('mainFloatingBar').style.display='block'; acceptTerms();"
+      class="btn-primary w-full py-3.5 text-sm font-black tracking-wide">
+      Acepto los Términos — ¡Ingresar!
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: TOP 10 COMPRADORES -->
+<div id="topTenModal" class="modal-overlay" style="display:none; z-index: 500;">
+  <div class="modal-sheet p-6">
+    <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
+    <div class="text-center mb-4">
+       <h2 class="text-2xl font-black mb-1 text-amber-500">🏆 TOP COMPRADORES</h2>
+       <p class="text-xs text-gray-400 font-bold tracking-widest uppercase" id="topTenSubtitle">Sorteo Activo</p>
+    </div>
+    <div id="topTenList" class="space-y-2 mb-4 max-h-[50vh] overflow-y-auto hide-scrollbar"></div>
+    <button onclick="document.getElementById('topTenModal').style.display='none'" class="btn-outline w-full py-3.5 text-xs font-bold">Cerrar Tabla</button>
+  </div>
+</div>
+
+<!-- MODAL: VERIFICAR MIS BOLETOS -->
+<div id="verifyModal" class="modal-overlay" style="display:none">
+  <div class="modal-sheet p-6">
+    <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
+    <h2 class="text-xl font-black text-gray-900 mb-1">🔍 Mis Boletos Adquiridos</h2>
+    <p class="text-xs text-gray-400 mb-4">Ingresa tu cédula tal cual la registraste en tu orden</p>
+    <div class="flex gap-2 mb-4">
+      <input id="verifyCedula" type="text" class="form-input px-3 py-3 text-sm flex-1 font-bold" placeholder="Ej: 19479080" autocomplete="off" onkeydown="if(event.key==='Enter') buscarMisBoletos()" />
+      <button onclick="buscarMisBoletos()" id="btnBuscarBoletos" class="btn-primary px-5 py-3 text-xs font-black">Buscar</button>
+    </div>
+    <div id="verifyResults" class="mb-2 max-h-[40vh] overflow-y-auto hide-scrollbar"></div>
+    <button onclick="closeVerifyModal()" class="btn-outline w-full py-3.5 text-xs font-bold mt-1">← Volver al Panel</button>
+  </div>
+</div>
+
+<!-- MODAL: PASARELA DE CHECKOUT -->
+<div id="payModal" class="modal-overlay" style="display:none">
+  <div class="modal-sheet p-6">
+    <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
+    <h2 class="text-xl font-black text-gray-900 mb-1">Completar Solicitud 🎟️</h2>
+    <p class="text-xs text-gray-400 mb-4">Envía los siguientes campos para apartar tus puestos</p>
+
+    <div class="mb-4">
+      <div class="text-[11px] font-black text-gray-400 mb-2 uppercase">Números que vas a adquirir:</div>
+      <div id="selectedChips" class="flex flex-wrap gap-1.5 max-h-[90px] overflow-y-auto hide-scrollbar"></div>
+    </div>
+
+    <div class="payment-box p-4 mb-4">
+      <div class="text-xs font-black text-rose-600 mb-2 tracking-wide uppercase">💳 DATOS DE TRANSFERENCIA MÓVIL</div>
+      <div class="space-y-2 text-xs text-gray-700 font-bold">
+        <div class="flex justify-between items-center bg-white/50 p-2 rounded-lg">
+          <span class="text-gray-400">Banco:</span>
+          <span>BNC 0191 <button class="copy-btn ml-1" onclick="copyText('0191','Banco Copiado')" title="Copiar">📋</button></span>
+        </div>
+        <div class="flex justify-between items-center bg-white/50 p-2 rounded-lg">
+          <span class="text-gray-400">C.I:</span>
+          <span>19479080 <button class="copy-btn ml-1" onclick="copyText('19479080','Cédula Copiada')" title="Copiar">📋</button></span>
+        </div>
+        <div class="flex justify-between items-center bg-white/50 p-2 rounded-lg">
+          <span class="text-gray-400">Teléfono:</span>
+          <span>04269395786 <button class="copy-btn ml-1" onclick="copyText('04269395786','Teléfono Copiado')" title="Copiar">📋</button></span>
+        </div>
+        <div class="border-t border-rose-200 pt-2 mt-1 flex justify-between items-center">
+          <span class="text-gray-500 font-black">Monto Total:</span>
+          <span class="font-black text-lg text-rose-600" id="modalTotal">Bs. 0</span>
+        </div>
+      </div>
+    </div>
+
     <form id="payForm" onsubmit="submitOrder(event)" class="space-y-3">
-      <input type="text" id="fNombre" class="form-input" placeholder="👤 Nombre Completo *" required />
-      <input type="text" id="fCedula" class="form-input" placeholder="🪪 Cédula *" required />
-      <input type="tel" id="fWhatsapp" class="form-input" placeholder="📱 WhatsApp *" required />
-      <input type="text" id="fRef" class="form-input text-center tracking-widest" placeholder="🔢 6 últimos dígitos ref *" required maxlength="6" minlength="6" />
-      <label class="block border-2 border-dashed border-pink-300 p-4 rounded-xl text-center cursor-pointer bg-white">
-        <span id="uploadText" class="text-sm font-bold text-gray-500">📷 Subir Capture</span>
-        <input type="file" id="fCapture" accept="image/*" class="hidden" onchange="previewCapture(this)" required />
-      </label>
-      <img id="capturePreview" class="w-full mt-2 hidden max-h-40 object-cover rounded-xl border border-gray-200" />
-      <button type="submit" class="btn-primary w-full py-4 text-base">🚀 Enviar Reserva</button>
-      <button type="button" onclick="closePayModal()" class="btn-outline w-full py-3">← Volver</button>
+      <div>
+        <label class="text-[11px] font-black text-gray-500 block mb-1">👤 Nombre y Apellido *</label>
+        <input type="text" id="fNombre" class="form-input px-3 py-2.5 text-sm font-bold" placeholder="Ej: Juan Pérez" required />
+      </div>
+      <div>
+        <label class="text-[11px] font-black text-gray-500 block mb-1">🪪 Cédula de Identidad *</label>
+        <input type="text" id="fCedula" class="form-input px-3 py-2.5 text-sm font-bold" placeholder="Ej: 19479080" required inputmode="text" />
+      </div>
+      <div>
+        <label class="text-[11px] font-black text-gray-500 block mb-1">📱 Celular WhatsApp *</label>
+        <input type="tel" id="fWhatsapp" class="form-input px-3 py-2.5 text-sm font-bold" placeholder="Ej: 04141234567" required inputmode="numeric" />
+      </div>
+      <div>
+        <label class="text-[11px] font-black text-gray-500 block mb-1">🔢 Últimos 6 dígitos de Referencia *</label>
+        <input type="text" id="fRef" class="form-input px-3 py-2.5 text-sm text-center font-black tracking-widest text-gray-900" placeholder="000000" required inputmode="numeric" maxlength="6" minlength="6" pattern="[0-9]{6}" />
+      </div>
+      <div>
+        <label class="text-[11px] font-black text-gray-500 block mb-1">📷 Foto del Comprobante *</label>
+        <label class="upload-area p-4 flex flex-col items-center gap-1.5 block" for="fCapture">
+          <div class="text-2xl" id="uploadIcon">📎</div>
+          <div class="text-xs text-gray-400 font-bold text-center" id="uploadText">Subir capture bancario</div>
+          <input type="file" id="fCapture" accept="image/*" class="hidden" onchange="previewCapture(this)" required />
+        </label>
+        <img id="capturePreview" class="w-full mt-2 hidden max-h-36 object-cover rounded-xl border" />
+      </div>
+      <button type="submit" class="btn-primary w-full py-3.5 text-sm font-black tracking-wide mt-2">🚀 Confirmar y Reservar</button>
+      <button type="button" onclick="closePayModal()" class="btn-outline w-full py-3 text-xs font-bold">← Modificar Números</button>
     </form>
   </div>
 </div>
 
+<!-- MODAL: EXITOSO -->
 <div id="successModal" class="modal-overlay" style="display:none">
-  <div class="modal-sheet text-center">
-    <div class="text-6xl mb-3">🌸</div>
-    <h2 class="text-2xl font-black text-gray-900 mb-1">¡Gracias por ayudar!</h2>
-    <p class="text-gray-500 text-sm mb-4">Tu reserva fue registrada y pronto será confirmada.</p>
-    <div class="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-4 text-left" id="successSummary"></div>
-    <button onclick="goVIP()" class="btn-primary w-full py-3 text-sm mb-2">📲 Ir al grupo VIP de la Rifa</button>
-    <button onclick="closeSuccessModal()" class="btn-outline w-full py-3 text-sm">✅ Cerrar</button>
+  <div class="modal-sheet p-6 text-center">
+    <div class="text-5xl mb-2">🎉</div>
+    <h2 class="text-2xl font-black text-gray-900 mb-1">¡Registro Exitoso!</h2>
+    <p class="text-xs text-gray-400 mb-4">Los datos se enviaron. El administrador aprobará tu compra a la brevedad.</p>
+    <div class="payment-box p-4 mb-4 text-left">
+      <div class="text-[11px] font-black text-rose-500 mb-1 uppercase">Resumen de Operación:</div>
+      <div id="successSummary" class="text-xs text-gray-700 font-bold"></div>
+    </div>
+    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-4">
+      <div class="text-xs font-black text-emerald-600 mb-2">Redirección Automática...</div>
+      <div class="cd-ring" id="cdRing" style="--pct:100%"><div class="cd-inner" id="cdNum">3</div></div>
+    </div>
+    <button onclick="goVIP()" class="btn-teal w-full py-3.5 text-xs font-black uppercase tracking-wider mb-2">📲 Entrar al grupo de WhatsApp</button>
+    <button onclick="closeSuccessModal()" class="btn-outline w-full py-3.5 text-xs font-bold">Entendido</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=2"></script>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=4"></script>
+
+<script>
+  function comenzarCompra() {
+      const termsAgreed = localStorage.getItem('termsAgreed');
+      if (!termsAgreed) {
+          document.getElementById('termsModal').style.display = 'flex';
+      } else {
+          document.getElementById('mainTicketSection').style.display = 'block';
+          document.getElementById('mainFloatingBar').style.display = 'block';
+          document.getElementById('mainTicketSection').scrollIntoView({ behavior: 'smooth' });
+      }
+  }
+
+  window.historialData = [];
+
+  document.addEventListener('DOMContentLoaded', async () => {
+      try {
+          const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
+          if(config) {
+              if(config.flyer_url) document.getElementById('activeFlyerImg').src = config.flyer_url;
+              if(config.mensaje) document.getElementById('activeMsgText').textContent = config.mensaje;
+          }
+
+          const { data: historial } = await db.from('historial_rifas').select('*').order('fecha_cierre', { ascending: false }).limit(3);
+          
+          if(historial && historial.length > 0) {
+              window.historialData = historial;
+              const carousel = document.getElementById('mainCarousel');
+              
+              historial.forEach(h => {
+                  const flyer = h.flyer_url || 'https://via.placeholder.com/600x800?text=Sorteo+Finalizado';
+                  const fecha = new Date(h.fecha_cierre).toLocaleDateString('es-VE');
+                  
+                  const slideHtml = `
+                  <div class="min-w-full snap-center relative">
+                    <img src="${flyer}" class="w-full aspect-[4/5] object-cover opacity-75 grayscale-[20%]">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent flex flex-col justify-end p-4 pb-6">
+                      <div class="bg-gray-900 text-white text-[10px] font-black px-2.5 py-1 rounded-md inline-block self-start mb-2 border border-gray-700 uppercase tracking-wider">CONCLUIDO • ${fecha}</div>
+                      
+                      <div class="bg-white border border-gray-100 p-4 rounded-2xl mb-4 shadow-xl">
+                        <div class="text-[10px] font-black text-gray-400 mb-0.5 uppercase">Boleto Ganador de la edición:</div>
+                        <div class="flex justify-between items-center">
+                          <span class="text-xl font-black text-rose-500">🎟️ ${h.ganador_numero}</span>
+                          <span class="text-sm font-black text-gray-800 truncate max-w-[150px]">${h.ganador_nombre}</span>
+                        </div>
+                      </div>
+
+                      <div class="grid grid-cols-2 gap-2">
+                        <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm active:bg-white/30">🔍 Consultar Cédula</button>
+                        <button onclick="abrirTopTenHistorial('${h.id}')" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold py-3 rounded-xl text-xs backdrop-blur-sm active:bg-amber-500/30">🏆 Top Compras</button>
+                      </div>
+                    </div>
+                  </div>`;
+                  carousel.insertAdjacentHTML('beforeend', slideHtml);
+              });
+              
+              document.getElementById('btnCarPrev').classList.remove('hidden');
+              document.getElementById('btnCarNext').classList.remove('hidden');
+          }
+      } catch(e) { console.log(e); }
+  });
+
+  function scrollCarousel(dir) {
+      const container = document.getElementById('mainCarousel');
+      const scrollAmount = container.clientWidth;
+      container.scrollBy({ left: dir * scrollAmount, behavior: 'smooth' });
+  }
+
+  async function abrirTopTenLive() {
+     document.getElementById('topTenSubtitle').textContent = 'Calculando compras actuales...';
+     document.getElementById('topTenList').innerHTML = '<div class="text-center py-6 text-xl">⏳</div>';
+     document.getElementById('topTenModal').style.display = 'flex';
+     document.body.style.overflow = 'hidden';
+     
+     try {
+         const { data, error } = await db.rpc('get_top_10_compradores');
+         if(error) throw error;
+         renderTopTen(data, '🏆 EDICIÓN EN CURSO');
+     } catch(e) {
+         document.getElementById('topTenList').innerHTML = '<div class="text-center text-red-500 font-bold py-4 text-xs">❌ No se pudieron mapear las posiciones.</div>';
+     }
+  }
+
+  function abrirTopTenHistorial(id) {
+      document.getElementById('topTenList').innerHTML = '<div class="text-center py-6 text-xl">⏳</div>';
+      document.getElementById('topTenModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      
+      const h = window.historialData.find(x => x.id === id);
+      if(h && h.top_compradores) {
+          renderTopTen(h.top_compradores, '📜 EDICIÓN FINALIZADA');
+      } else {
+          renderTopTen([], '📜 EDICIÓN FINALIZADA');
+      }
+  }
+
+  function renderTopTen(lista, subtitulo) {
+      document.getElementById('topTenSubtitle').textContent = subtitulo;
+      const listDiv = document.getElementById('topTenList');
+      if(!lista || lista.length === 0) {
+          listDiv.innerHTML = '<div class="text-center text-gray-400 py-6 text-xs font-bold">Ninguna compra registrada hasta el momento.</div>';
+          return;
+      }
+      
+      let html = '';
+      lista.forEach((item, index) => {
+          let medalla = '';
+          let bgClass = 'bg-gray-50 border-gray-200';
+          if(index === 0) { medalla = '🥇'; bgClass = 'bg-amber-50 border-amber-300'; }
+          else if(index === 1) { medalla = '🥈'; bgClass = 'bg-slate-50 border-slate-300'; }
+          else if(index === 2) { medalla = '🥉'; bgClass = 'bg-orange-50 border-orange-200'; }
+          else { medalla = `<span class="text-gray-400 font-black text-xs w-full text-center block">#${index+1}</span>`; }
+          
+          html += `
+          <div class="flex items-center justify-between border p-3 rounded-xl ${bgClass}">
+             <div class="flex items-center gap-3">
+                <div class="w-7 flex justify-center items-center text-xl">${medalla}</div>
+                <div class="font-bold text-xs text-gray-800">${item.nombre.substring(0,22)}</div>
+             </div>
+             <div class="text-[11px] font-black bg-rose-50 text-rose-600 px-2.5 py-1 rounded-lg border border-rose-200 whitespace-nowrap">
+                ${item.cantidad} números
+             </div>
+          </div>`;
+      });
+      listDiv.innerHTML = html;
+  }
+</script>
 </body>
 </html>
