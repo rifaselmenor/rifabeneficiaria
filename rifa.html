@@ -11,8 +11,6 @@
       --rose: #F43F5E;
       --rose-light: #FDA4AF;
       --bg: #FFFFFF;
-      --glass: rgba(255, 255, 255, 0.5);
-      --glass-border: rgba(255, 255, 255, 0.7);
       --text: #1F2937;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -29,86 +27,68 @@
       pointer-events: none; z-index: 0;
     }
     .content { position: relative; z-index: 1; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* GRID DE NUMERACIÓN (Bordes Negros de tu diseño original) */
-    .ticket-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-    @media(min-width:400px){ .ticket-grid { grid-template-columns: repeat(5, 1fr); gap: 10px; } }
+    /* REJILLA ESTILO ORIGINAL CON BORDES NEGROS */
+    .ticket-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     
     .ticket {
       aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
       border-radius: 16px; font-size: 16px; font-weight: 900; cursor: pointer;
-      transition: transform .15s, box-shadow .15s;
-      border: 2px solid #000000; user-select: none; position: relative;
+      transition: transform .15s; border: 2px solid #000000; user-select: none;
     }
-    .ticket-available { background: #FFFFFF; color: #000000; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .ticket-available { background: #FFFFFF; color: #000000; }
     .ticket-available:active { transform: scale(.9); }
     .ticket-selected {
       background: linear-gradient(135deg, #F43F5E 0%, #FDA4AF 100%);
-      color: #FFFFFF; box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3); transform: scale(1.05);
+      color: #FFFFFF; transform: scale(1.05);
     }
 
-    /* INPUTS & BOTONES */
     .search-input {
       background: #FFFFFF; border: 2px solid #F3F4F6;
       border-radius: 18px; color: #1F2937; outline: none; transition: all .2s;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.01);
     }
-    .search-input:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.1); }
+    .search-input:focus { border-color: var(--rose); }
     
-    .form-input {
-      background: #FFFFFF; border: 2px solid #E5E7EB;
-      border-radius: 14px; color: #1F2937; outline: none; width: 100%; transition: all .2s;
-    }
-    .form-input:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15); }
+    .form-input { background: #FFFFFF; border: 2px solid #E5E7EB; border-radius: 14px; outline: none; }
+    .form-input:focus { border-color: var(--rose); }
 
     .btn-primary {
       background: linear-gradient(135deg, var(--rose) 0%, #FDA4AF 100%);
       color: #fff; font-weight: 900; border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(244, 63, 94, 0.2);
     }
     .btn-primary:disabled { opacity: .3; cursor: not-allowed; }
     .btn-outline { background: #FFFFFF; border: 2px solid #E5E7EB; color: #4B5563; font-weight: 700; border-radius: 16px; }
 
-    /* BARRA INFERIOR */
     .floating-bar {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: rgba(255, 255, 255, 0.95); border-top: 1px solid rgba(244, 63, 94, 0.1);
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 100;
-      padding-bottom: env(safe-area-inset-bottom);
-      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.05);
+      backdrop-filter: blur(20px); z-index: 100;
     }
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 200;
-      display: flex; align-items: flex-end;
-    }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: flex-end; }
     .modal-sheet { width: 100%; background: #FFFFFF; border-top-left-radius: 28px; border-top-right-radius: 28px; max-height: 90vh; overflow-y: auto; }
-    .payment-box { background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border: 1px solid #FECDD3; border-radius: 20px; }
   </style>
 </head>
 <body>
 <div class="content">
 
-  <!-- CABECERA LIMPIA: SÓLO EL FLYER Y BOTONES SECUNDARIOS -->
+  <!-- HERO SUPERIOR REVISADO (SIN BOTÓN DUPLICADO DE COMPRAS) -->
   <div class="relative w-full overflow-hidden bg-gray-50 border-b border-gray-100 shadow-sm">
     <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover" alt="Sorteo">
     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-4 pb-6">
       
-      <!-- Fila de Botones de Consulta (Sin Comprar Tickets Duplicado) -->
+      <!-- Fila Única de Consultas -->
       <div class="grid grid-cols-2 gap-3 max-w-md w-full mx-auto">
-        <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm active:bg-white/30">🔍 Mis Tickets</button>
-        <button onclick="abrirTopTenLive()" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold py-3 rounded-xl text-xs backdrop-blur-sm active:bg-amber-500/30">🏆 Top Compras</button>
+        <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm">🔍 Mis Tickets</button>
+        <button onclick="abrirTopTenLive()" class="bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold py-3 rounded-xl text-xs backdrop-blur-sm">🏆 Top Compras</button>
       </div>
 
     </div>
   </div>
 
-  <!-- PANEL PRINCIPAL DE INTERACCIÓN -->
+  <!-- SECCIÓN SELECCIÓN DE TICKETS -->
   <main class="px-4 pt-5 pb-36 max-w-md mx-auto">
 
-    <!-- PANEL DE ESTADÍSTICAS -->
+    <!-- CONTADORES RÁPIDOS -->
     <div class="grid grid-cols-3 gap-2.5 mb-5">
       <div class="bg-white border border-gray-100 rounded-2xl p-2.5 text-center shadow-sm">
         <div class="text-[11px] font-bold text-gray-400 uppercase">Precio</div>
@@ -124,7 +104,7 @@
       </div>
     </div>
 
-    <!-- SELECCIÓN AL AZAR -->
+    <!-- SELECCIÓN RANDOM -->
     <div class="bg-white border border-gray-100 rounded-3xl p-4 mb-5 shadow-sm">
       <div class="text-xs font-black text-center text-rose-500 uppercase tracking-widest mb-3">🎲 Generación por Azar</div>
       <div class="flex items-center justify-center gap-4 mb-3">
@@ -139,14 +119,13 @@
       </button>
     </div>
 
-    <!-- BUSCADOR MANUAL CORREGIDO FILTRADO EXACTO -->
+    <!-- BUSCADOR INTELIGENTE EN VIVO (MUESTRA SOLO EL NÚMERO BUSCADO) -->
     <div class="mb-5">
       <input type="text" id="searchInput" oninput="filtrarTicketExacto()"
-        class="search-input w-full px-4 py-3.5 text-sm font-black text-center tracking-widest text-gray-800 uppercase"
+        class="search-input w-full px-4 py-3.5 text-sm font-black text-center tracking-widest text-gray-800"
         placeholder="🔎 DIGITA UN NÚMERO MANUAL..." maxlength="2" inputmode="numeric" />
     </div>
 
-    <!-- LEYENDA -->
     <div class="flex gap-4 mb-4 justify-center">
       <div class="flex items-center gap-1.5">
         <div style="width:14px;height:14px;border-radius:4px;background:#FFFFFF;border:2px solid #000;"></div>
@@ -158,12 +137,12 @@
       </div>
     </div>
 
-    <!-- REJILLA DE NÚMEROS (00-99) -->
+    <!-- REJILLA CENTRAL -->
     <div id="ticketGrid" class="ticket-grid mb-5"></div>
 
   </main>
 
-  <!-- BARRA DE COMPRA INFERIOR FLOTANTE -->
+  <!-- BARRA DE ACCIÓN FLOTANTE COMPRA -->
   <div class="floating-bar px-4 py-3">
     <div class="max-w-md mx-auto">
       <div class="flex items-center gap-3 mb-2">
@@ -192,19 +171,17 @@
 
 </div>
 
-<!-- MODAL: TOP 10 COMPRADORES -->
+<!-- MODAL TABLA TOP 10 -->
 <div id="topTenModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
     <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
-    <div class="text-center mb-4">
-       <h2 class="text-xl font-black text-amber-500">🏆 TOP COMPRADORES</h2>
-    </div>
+    <div class="text-center mb-4"><h2 class="text-xl font-black text-amber-500">🏆 TOP COMPRADORES</h2></div>
     <div id="topTenList" class="space-y-2 mb-4"></div>
     <button onclick="document.getElementById('topTenModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold">Cerrar Tabla</button>
   </div>
 </div>
 
-<!-- MODAL: VERIFICAR MIS BOLETOS -->
+<!-- MODAL VERIFICACIÓN BOLETOS -->
 <div id="verifyModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
     <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
@@ -218,45 +195,36 @@
   </div>
 </div>
 
-<!-- MODAL: CHECKOUT -->
+<!-- MODAL PROCEDER AL PAGO -->
 <div id="payModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
     <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
     <h2 class="text-xl font-black text-gray-900 mb-4">Completar Solicitud 🎟️</h2>
-    <!-- El formulario completo y campos de pago móvil se rellenan mediante app.js -->
-    <button onclick="document.getElementById('payModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold">Modificar Números</button>
+    <div id="checkoutFormContainer"></div>
+    <button onclick="document.getElementById('payModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold mt-2">Modificar Números</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=2"></script>
 <script src="app.js?v=4"></script>
-
 <script>
   let cantidadAzar = 2;
-  
   function ajustarAzar(val) {
     cantidadAzar = Math.max(1, cantidadAzar + val);
     document.getElementById('displayCantidadAzar').textContent = cantidadAzar;
   }
 
-  // FUNCIÓN DE FILTRADO EXACTO CORREGIDA PARA EL BUSCADOR
+  // FILTRADO DINÁMICO EXACTO EN VIVO
   function filtrarTicketExacto() {
     const query = document.getElementById('searchInput').value.trim();
     const tickets = document.querySelectorAll('.ticket');
-    
     tickets.forEach(ticket => {
       const numeroTicket = ticket.textContent.trim();
       if (query === '') {
-        // Si el buscador está vacío, mostramos todos los números de nuevo
         ticket.style.display = 'flex';
       } else {
-        // Si tiene texto, solo mostramos la coincidencia exacta
-        if (numeroTicket === query.padStart(2, '0')) {
-          ticket.style.display = 'flex';
-        } else {
-          ticket.style.display = 'none';
-        }
+        ticket.style.display = (numeroTicket === query.padStart(2, '0')) ? 'flex' : 'none';
       }
     });
   }
@@ -283,9 +251,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
-      if(config && config.flyer_url) {
-        document.getElementById('activeFlyerImg').src = config.flyer_url;
-      }
+      if(config && config.flyer_url) document.getElementById('activeFlyerImg').src = config.flyer_url;
     } catch(e) { console.error(e); }
   });
 </script>
