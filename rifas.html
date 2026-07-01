@@ -195,13 +195,58 @@
   </div>
 </div>
 
-<!-- MODAL PROCEDER AL PAGO -->
+<!-- MODAL PROCEDER AL PAGO (EDITADO AQUI PARA AGREGAR EL FORMULARIO) -->
 <div id="payModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
     <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
     <h2 class="text-xl font-black text-gray-900 mb-4">Completar Solicitud 🎟️</h2>
-    <div id="checkoutFormContainer"></div>
-    <button onclick="document.getElementById('payModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold mt-2">Modificar Números</button>
+    
+    <div id="checkoutFormContainer">
+      <!-- FORMULARIO DE RECOLECCIÓN DE DATOS Y COMPROBANTE -->
+      <form id="paymentForm" onsubmit="procesarFormulario(event)" class="space-y-4">
+        
+        <!-- Nombre -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Nombre Completo</label>
+          <input type="text" id="payNombre" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: Juan Pérez" />
+        </div>
+
+        <!-- Cédula -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Número de Cédula</label>
+          <input type="text" id="payCedula" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 12345678" />
+        </div>
+
+        <!-- WhatsApp -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Número de WhatsApp</label>
+          <input type="tel" id="payWhatsapp" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 04141234567" />
+          <p class="text-[10px] text-rose-500 mt-1 font-bold">⚠️ Obligatorio: Debe ser un número con WhatsApp activo.</p>
+        </div>
+
+        <!-- Últimos 6 dígitos -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Últimos 6 dígitos del comprobante</label>
+          <input type="text" id="payReferencia" required maxlength="6" class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 123456" />
+        </div>
+
+        <!-- Subir Imagen -->
+        <div>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Subir Comprobante (Imagen)</label>
+          <div class="border-2 border-dashed border-gray-300 rounded-xl p-3 text-center bg-gray-50">
+            <input type="file" id="payComprobante" accept="image/*" required class="w-full text-xs font-bold text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-rose-100 file:text-rose-700 hover:file:bg-rose-200" />
+          </div>
+        </div>
+
+        <!-- Botón de Confirmar -->
+        <button type="submit" class="w-full bg-emerald-500 text-white font-black py-4 rounded-xl text-sm tracking-wide shadow-md hover:bg-emerald-600 transition-colors mt-2">
+          ✅ Confirmar Boleto y Pago
+        </button>
+      </form>
+    </div>
+
+    <!-- Botón Volver -->
+    <button onclick="document.getElementById('payModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold mt-3">Volver a Modificar Números</button>
   </div>
 </div>
 
@@ -246,6 +291,14 @@
          } else { html = '<div class="text-center text-xs text-gray-400">Sin registros</div>'; }
          document.getElementById('topTenList').innerHTML = html;
      } catch(e) { console.error(e); }
+  }
+
+  // NUEVA FUNCION: Previene que la pagina se recargue al darle click a "Confirmar Pago"
+  function procesarFormulario(e) {
+    e.preventDefault();
+    // NOTA PARA TI: Aquí es donde tu archivo app.js debe recolectar los datos (payNombre.value, etc) 
+    // y subir la imagen a Supabase. Como no tocamos app.js, dejo el form listo visualmente.
+    console.log("Formulario enviado. Conecta esto en tu app.js");
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
