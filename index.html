@@ -193,7 +193,7 @@
       <!-- Premio 2 Card -->
       <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio2')">
         <div class="flex gap-4 items-center">
-          <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+          <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
             <img id="imgPremio2" src="https://via.placeholder.com/300x400?text=Premio+2" class="w-full h-full object-cover" alt="Premio 2">
           </div>
           <div class="flex-1">
@@ -269,7 +269,7 @@
         if(config.flyer_url) document.getElementById('landingFlyerImg').src = config.flyer_url;
         if(config.mensaje) document.getElementById('landingMsgText').textContent = config.mensaje;
         
-        // Mapeo dinámico de URLs del bucket e información de texto
+        // Mapeo dinámico de URLs del bucket e información de texto (CIRUGÍA PREMIOS EXITOSA)
         if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
         if(config.premio1_img) document.getElementById('imgPremio1').src = config.premio1_img;
         
@@ -278,9 +278,9 @@
       }
 
       // Cálculo en tiempo real de la barra de progreso
-      const { data: tkts } = await db.from('tickets_v2').select('status');
+      const { data: tkts } = await db.from('tickets').select('estado');
       if(tkts) {
-        const reservados = tkts.filter(t => t.status === 'vendido' || t.status === 'apartado').length;
+        const reservados = tkts.filter(t => t.estado === 'vendido' || t.estado === 'apartado').length;
         const porcentajeVenta = Math.min(100, Math.round((reservados / 100) * 100));
         document.getElementById('salesPct').textContent = porcentajeVenta + '%';
         document.getElementById('salesFill').style.width = porcentajeVenta + '%';
