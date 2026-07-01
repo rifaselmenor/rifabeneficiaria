@@ -184,6 +184,18 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js?v=2"></script>
+
+  // Funciones para el visor de imágenes Lightbox HD
+function openLightbox(src) {
+  if (!src || src.includes('placeholder')) return; // Evita abrir si no hay imagen real cargada
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').style.display = 'flex';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+}
+
 <script>
   function openPremiosModal() { document.getElementById('premiosModal').style.display = 'flex'; }
   function closePremiosModal() { document.getElementById('premiosModal').style.display = 'none'; }
@@ -230,5 +242,31 @@
     } catch(e) { console.error(e); }
   });
 </script>
+  <!-- VISOR LIGHTBOX 3:4 HD (ESTILO CHAT CON X ARRIBA) -->
+<div id="lightbox" class="lightbox-overlay" style="display:none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 16px;">
+  <!-- Botón de cerrar (X) en la esquina superior -->
+  <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white text-3xl font-black bg-black/40 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm z-50">✕</button>
+  
+  <div class="w-full max-w-md">
+    <!-- Contenedor forzado a Aspect Ratio 3:4 Exacto -->
+    <div class="w-full aspect-[3/4] bg-neutral-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+      <img id="lightboxImg" src="" class="w-full h-full object-cover" alt="Imagen en Alta Definición">
+    </div>
+  </div>
+</div>
+  <!-- Ejemplo para el Premio 1 (Aplica la misma lógica a los demás) -->
+<div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4 cursor-pointer" onclick="openLightbox(document.getElementById('imgPremio1').src)">
+  <div class="flex gap-4 items-center">
+    <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center overflow-hidden shadow-inner">
+      <!-- Tu imagen actual conectada a Supabase -->
+      <img id="imgPremio1" src="URL_DE_TU_BUCKET_AQUÍ" class="w-full h-full object-cover" alt="P1">
+    </div>
+    <div class="flex-1">
+      <h3 class="font-black text-gray-900 text-base">Primer Premio</h3>
+      <p id="descPremio1" class="text-xs text-gray-500 mt-0.5 font-medium">¡Gran Combo Sorpresa! Toca la imagen para ampliar en HD.</p>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
