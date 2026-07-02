@@ -104,6 +104,22 @@
       justify-content: center;
       padding: 16px;
     }
+
+    /* SKELETON / SHIMMER — reemplaza la sensación de "congelado" mientras
+       cargan datos reales, usando la misma paleta rosa del resto del sitio. */
+    @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    .img-skeleton {
+      background: linear-gradient(90deg, #FFF1F2 25%, #FFE4E6 37%, #FFF1F2 63%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+    .ticket-skeleton {
+      aspect-ratio: 1;
+      border-radius: 16px;
+      background: linear-gradient(90deg, #F3F4F6 25%, #FFE4E6 37%, #F3F4F6 63%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
   </style>
 </head>
 <body>
@@ -134,7 +150,7 @@
 
   <!-- HERO SUPERIOR REVISADO (SIN TOP COMPRAS, CON BOTÓN VER PREMIOS) -->
   <div class="relative w-full overflow-hidden bg-gray-50 border-b border-gray-100 shadow-sm">
-    <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover" alt="Sorteo">
+    <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover img-skeleton" alt="Sorteo" fetchpriority="high" decoding="async" loading="eager" width="600" height="750">
     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-4 pb-6">
       
       <!-- Fila Única de Consultas con Botón Ver Premios -->
@@ -249,7 +265,7 @@
       <div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio1')">
         <div class="flex gap-4 items-center">
           <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-            <img id="imgPremio1" src="https://via.placeholder.com/300x400?text=Premio+1" class="w-full h-full object-cover" alt="Premio 1">
+            <img id="imgPremio1" src="https://via.placeholder.com/300x400?text=Premio+1" class="w-full h-full object-cover" alt="Premio 1" loading="lazy" decoding="async">
           </div>
           <div class="flex-1">
             <h3 class="font-black text-gray-900 text-base">Primer Premio</h3>
@@ -262,7 +278,7 @@
       <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio2')">
         <div class="flex gap-4 items-center">
           <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-            <img id="imgPremio2" src="https://via.placeholder.com/300x400?text=Premio+2" class="w-full h-full object-cover" alt="Premio 2">
+            <img id="imgPremio2" src="https://via.placeholder.com/300x400?text=Premio+2" class="w-full h-full object-cover" alt="Premio 2" loading="lazy" decoding="async">
           </div>
           <div class="flex-1">
             <h3 class="font-black text-gray-900 text-sm">Segundo Premio</h3>
@@ -312,7 +328,7 @@
     <h2 class="text-xl font-black text-gray-900 mb-4">Completar Solicitud 🎟️</h2>
     
     <div id="checkoutFormContainer">
-      <form id="paymentForm" onsubmit="procesarFormulario(event)" class="space-y-4">
+      <form id="paymentForm" onsubmit="submitOrder(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">Nombre Completo</label>
           <input type="text" id="payNombre" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: Juan Pérez" />
@@ -400,17 +416,18 @@
 
   function openVerifyModal() { document.getElementById('verifyModal').style.display = 'flex'; }
 
-  function procesarFormulario(e) {
-    e.preventDefault();
-    console.log("Formulario enviado. Conecta esto en tu app.js");
-  }
-
   // Carga Síncrona Dinámica desde Base de Datos (Supabase)
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
+      // Reutilizamos la MISMA petición que ya disparó app.js (window.rifaConfigPromise)
+      // en vez de volver a consultar landing_config aquí. Antes esta página hacía
+      // DOS peticiones idénticas a Supabase en cada carga.
+      const { data: config } = await window.rifaConfigPromise;
+      const flyerImg = document.getElementById('activeFlyerImg');
       if(config) {
-        if(config.flyer_url) document.getElementById('activeFlyerImg').src = config.flyer_url;
+        if(config.flyer_url && flyerImg) {
+          flyerImg.src = config.flyer_url;
+        }
         
         // Carga la información de los premios si existe en la base de datos
         if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
@@ -419,7 +436,12 @@
         if(config.premio2_desc) document.getElementById('descPremio2').textContent = config.premio2_desc;
         if(config.premio2_img) document.getElementById('imgPremio2').src = config.premio2_img;
       }
-    } catch(e) { console.error("Error cargando configuración inicial:", e); }
+      if (flyerImg) flyerImg.classList.remove('img-skeleton');
+    } catch(e) {
+      console.error("Error cargando configuración inicial:", e);
+      const flyerImg = document.getElementById('activeFlyerImg');
+      if (flyerImg) flyerImg.classList.remove('img-skeleton');
+    }
   });
 </script>
 </body>
