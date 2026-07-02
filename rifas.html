@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Rifa Ana â€” SelecciÃ³n de Tickets ðŸŽŸï¸</title>
+  <title>Rifa Ana — Selección de Tickets 🎟️</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
@@ -28,7 +28,7 @@
     }
     .content { position: relative; z-index: 1; }
 
-    /* DECORACIÃ“N FLORAL AMBIENTAL â€” acorde a la paleta rosa, 35% opacidad */
+    /* DECORACIÓN FLORAL AMBIENTAL — acorde a la paleta rosa, 35% opacidad */
     .floral-decor {
       position: fixed;
       inset: 0;
@@ -68,6 +68,35 @@
     .form-input { background: #FFFFFF; border: 2px solid #E5E7EB; border-radius: 14px; outline: none; }
     .form-input:focus { border-color: var(--rose); }
 
+    /* BLOQUE DE DATOS DE PAGO MÓVIL — dentro del modal "Confirmar Boleto y Pago" */
+    .pago-movil-box {
+      background: linear-gradient(180deg, #FFF1F2 0%, #FFFFFF 65%);
+      border: 1px solid #FFE4E6;
+      border-radius: 20px;
+    }
+    .pago-movil-row {
+      background: #FFFFFF;
+      border: 1px solid #FFE4E6;
+      border-radius: 14px;
+    }
+    .copy-icon-btn {
+      color: var(--rose);
+      background: #FFF1F2;
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .15s, background .15s, color .15s;
+    }
+    .copy-icon-btn:active { transform: scale(.88); }
+    .copy-icon-btn.copied { background: #DCFCE7; color: #16A34A; }
+
     .btn-primary {
       background: linear-gradient(135deg, var(--rose) 0%, #FDA4AF 100%);
       color: #fff; font-weight: 900; border-radius: 16px;
@@ -105,7 +134,7 @@
       padding: 16px;
     }
 
-    /* SKELETON / SHIMMER â€” reemplaza la sensaciÃ³n de "congelado" mientras
+    /* SKELETON / SHIMMER — reemplaza la sensación de "congelado" mientras
        cargan datos reales, usando la misma paleta rosa del resto del sitio. */
     @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
     .img-skeleton {
@@ -121,10 +150,10 @@
       animation: shimmer 1.4s ease-in-out infinite;
     }
 
-    /* TOAST â€” esta clase la usa showToast() en app.js para los avisos de
-       "compra registrada" / "pago rechazado, nÃºmero ocupado" / errores.
-       Faltaba aquÃ­ (solo estaba en admin.html), por eso el mensaje se
-       insertaba en el HTML pero quedaba sin posiciÃ³n ni estilo: invisible. */
+    /* TOAST — esta clase la usa showToast() en app.js para los avisos de
+       "compra registrada" / "pago rechazado, número ocupado" / errores.
+       Faltaba aquí (solo estaba en admin.html), por eso el mensaje se
+       insertaba en el HTML pero quedaba sin posición ni estilo: invisible. */
     .toast {
       position:fixed; top:20px; left:50%; transform:translateX(-50%);
       background:#FFFFFF; border:1px solid #FDA4AF;
@@ -140,7 +169,7 @@
 </head>
 <body>
 
-<!-- DECORACIÃ“N FLORAL AMBIENTAL (SVG, acorde a la paleta rosa) -->
+<!-- DECORACIÓN FLORAL AMBIENTAL (SVG, acorde a la paleta rosa) -->
 <div class="floral-decor" aria-hidden="true">
   <svg width="0" height="0" style="position:absolute">
     <symbol id="floralBloom" viewBox="0 0 120 120">
@@ -164,31 +193,31 @@
 
 <div class="content">
 
-  <!-- HERO SUPERIOR REVISADO (SIN TOP COMPRAS, CON BOTÃ“N VER PREMIOS) -->
+  <!-- HERO SUPERIOR REVISADO (SIN TOP COMPRAS, CON BOTÓN VER PREMIOS) -->
   <div class="relative w-full overflow-hidden bg-gray-50 border-b border-gray-100 shadow-sm">
     <img id="activeFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando..." class="w-full aspect-[4/5] object-cover img-skeleton" alt="Sorteo" fetchpriority="high" decoding="async" loading="eager" width="600" height="750">
     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-4 pb-6">
       
-      <!-- Fila Ãšnica de Consultas con BotÃ³n Ver Premios -->
+      <!-- Fila Única de Consultas con Botón Ver Premios -->
       <div class="grid grid-cols-2 gap-3 max-w-md w-full mx-auto">
-        <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm shadow-lg">ðŸ” Mis Tickets</button>
-        <button onclick="openPremiosModal()" class="bg-rose-500 border border-rose-400 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm shadow-lg">ðŸŽ Ver Premios</button>
+        <button onclick="openVerifyModal()" class="bg-white/20 border border-white/30 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm shadow-lg">🔍 Mis Tickets</button>
+        <button onclick="openPremiosModal()" class="bg-rose-500 border border-rose-400 text-white font-bold py-3 rounded-xl text-xs backdrop-blur-sm shadow-lg">🎁 Ver Premios</button>
       </div>
 
     </div>
   </div>
 
-  <!-- SECCIÃ“N SELECCIÃ“N DE TICKETS -->
+  <!-- SECCIÓN SELECCIÓN DE TICKETS -->
   <main class="px-4 pt-5 pb-36 max-w-md mx-auto">
 
-    <!-- CONTADORES RÃPIDOS -->
+    <!-- CONTADORES RÁPIDOS -->
     <div class="grid grid-cols-3 gap-2.5 mb-5">
       <div class="bg-white border border-gray-100 rounded-2xl p-2.5 text-center shadow-sm">
         <div class="text-[11px] font-bold text-gray-400 uppercase">Precio</div>
         <div class="text-sm font-black text-rose-600">Bs. <span id="statPrecio">5</span></div>
       </div>
       <div class="bg-white border border-gray-100 rounded-2xl p-2.5 text-center shadow-sm">
-        <div class="text-[11px] font-bold text-gray-400 uppercase">MÃ­nimo</div>
+        <div class="text-[11px] font-bold text-gray-400 uppercase">Mínimo</div>
         <div class="text-sm font-black text-gray-700"><span id="statMin">2</span> pcs</div>
       </div>
       <div class="bg-white border border-gray-100 rounded-2xl p-2.5 text-center shadow-sm">
@@ -197,9 +226,9 @@
       </div>
     </div>
 
-    <!-- SELECCIÃ“N RANDOM -->
+    <!-- SELECCIÓN RANDOM -->
     <div class="bg-white border border-gray-100 rounded-3xl p-4 mb-5 shadow-sm">
-      <div class="text-xs font-black text-center text-rose-500 uppercase tracking-widest mb-3">ðŸŽ² GeneraciÃ³n por Azar</div>
+      <div class="text-xs font-black text-center text-rose-500 uppercase tracking-widest mb-3">🎲 Generación por Azar</div>
       <div class="flex items-center justify-center gap-4 mb-3">
         <button onclick="ajustarAzar(-1)" class="w-11 h-11 rounded-xl bg-gray-50 text-gray-600 font-black text-xl border border-gray-200 flex items-center justify-center">-</button>
         <div class="w-20 h-11 flex items-center justify-center bg-gray-50 border border-gray-200 rounded-xl">
@@ -208,7 +237,7 @@
         <button onclick="ajustarAzar(1)" class="w-11 h-11 rounded-xl bg-gray-50 text-gray-600 font-black text-xl border border-gray-200 flex items-center justify-center">+</button>
       </div>
       <button onclick="randomSelect()" class="w-full bg-gray-900 text-white font-bold py-3.5 rounded-xl text-xs tracking-wider">
-        COMPLETAR SELECCIÃ“N AL AZAR
+        COMPLETAR SELECCIÓN AL AZAR
       </button>
     </div>
 
@@ -216,7 +245,7 @@
     <div class="mb-5">
       <input type="text" id="searchInput" oninput="filtrarTicketExacto()"
         class="search-input w-full px-4 py-3.5 text-sm font-black text-center tracking-widest text-gray-800"
-        placeholder="ðŸ”Ž DIGITA UN NÃšMERO MANUAL..." maxlength="2" inputmode="numeric" />
+        placeholder="🔎 DIGITA UN NÚMERO MANUAL..." maxlength="2" inputmode="numeric" />
     </div>
 
     <div class="flex gap-4 mb-4 justify-center">
@@ -235,7 +264,7 @@
 
   </main>
 
-  <!-- BARRA DE ACCIÃ“N FLOTANTE COMPRA -->
+  <!-- BARRA DE ACCIÓN FLOTANTE COMPRA -->
   <div class="floating-bar px-4 py-3">
     <div class="max-w-md mx-auto">
       <div class="flex items-center gap-3 mb-2">
@@ -254,9 +283,9 @@
         </div>
       </div>
       <div class="grid grid-cols-2 gap-2">
-        <button onclick="clearSelection()" class="btn-outline py-3 text-xs font-bold">ðŸ—‘ï¸ Limpiar Todo</button>
+        <button onclick="clearSelection()" class="btn-outline py-3 text-xs font-bold">🗑️ Limpiar Todo</button>
         <button onclick="openPayModal()" id="btnPagar" class="btn-primary py-3 text-xs font-black tracking-wide" disabled>
-          ðŸ’³ Procesar Pago
+          💳 Procesar Pago
         </button>
       </div>
     </div>
@@ -264,14 +293,14 @@
 
 </div>
 
-<!-- MODAL SHEET DESPLEGABLE: INFORMACIÃ“N DE PREMIOS -->
+<!-- MODAL SHEET DESPLEGABLE: INFORMACIÓN DE PREMIOS -->
 <div id="premiosModal" class="modal-backdrop" style="display:none;">
   <div class="modal-sheet p-6">
     <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-5"></div>
     
     <div class="flex justify-between items-center mb-5">
-      <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">ðŸŽ Premios del Sorteo</h2>
-      <button onclick="closePremiosModal()" class="text-gray-400 text-xl font-bold p-1">âœ•</button>
+      <h2 class="text-xl font-black text-gray-900 flex items-center gap-2">🎁 Premios del Sorteo</h2>
+      <button onclick="closePremiosModal()" class="text-gray-400 text-xl font-bold p-1">✕</button>
     </div>
 
     <!-- Lista de Contenedores de Premios -->
@@ -285,7 +314,7 @@
           </div>
           <div class="flex-1">
             <h3 class="font-black text-gray-900 text-base">Primer Premio</h3>
-            <p id="descPremio1" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Sincronizando descripciÃ³n oficial del primer premio...</p>
+            <p id="descPremio1" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Sincronizando descripción oficial del primer premio...</p>
           </div>
         </div>
       </div>
@@ -298,7 +327,7 @@
           </div>
           <div class="flex-1">
             <h3 class="font-black text-gray-900 text-sm">Segundo Premio</h3>
-            <p id="descPremio2" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Sincronizando descripciÃ³n oficial del segundo premio...</p>
+            <p id="descPremio2" class="text-xs text-gray-500 mt-0.5 font-medium leading-relaxed">Sincronizando descripción oficial del segundo premio...</p>
           </div>
         </div>
       </div>
@@ -306,30 +335,30 @@
     </div>
 
     <button onclick="closePremiosModal()" class="btn-primary w-full py-4 text-xs font-black uppercase tracking-wider mt-5">
-      â† Hacia atrÃ¡s
+      ← Hacia atrás
     </button>
   </div>
 </div>
 
-<!-- CAPA LIGHTBOX MULTIMEDIA HD (ESTILO CHAT CON BOTÃ“N X) -->
+<!-- CAPA LIGHTBOX MULTIMEDIA HD (ESTILO CHAT CON BOTÓN X) -->
 <div id="lightboxOverlay" class="lightbox-backdrop" style="display:none;" onclick="handleOutsideLightboxClick(event)">
-  <!-- BotÃ³n X estricto -->
-  <button onclick="closeLightboxView()" class="absolute top-6 right-6 text-white text-3xl font-black bg-black/40 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm z-50">âœ•</button>
+  <!-- Botón X estricto -->
+  <button onclick="closeLightboxView()" class="absolute top-6 right-6 text-white text-3xl font-black bg-black/40 w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-sm z-50">✕</button>
   
   <div class="w-full max-w-md px-4" onclick="event.stopPropagation()">
     <div class="w-full aspect-[3/4] bg-neutral-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10">
-      <img id="lightboxDisplayImg" src="" class="w-full h-full object-cover" alt="VisualizaciÃ³n HD">
+      <img id="lightboxDisplayImg" src="" class="w-full h-full object-cover" alt="Visualización HD">
     </div>
   </div>
 </div>
 
-<!-- MODAL VERIFICACIÃ“N BOLETOS -->
+<!-- MODAL VERIFICACIÓN BOLETOS -->
 <div id="verifyModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
     <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
-    <h2 class="text-xl font-black text-gray-900 mb-4">ðŸ” Mis Boletos</h2>
+    <h2 class="text-xl font-black text-gray-900 mb-4">🔍 Mis Boletos</h2>
     <div class="flex gap-2 mb-4">
-      <input id="verifyCedula" type="text" class="form-input px-3 py-3 text-sm flex-1 font-bold" placeholder="Ingresa tu cÃ©dula" />
+      <input id="verifyCedula" type="text" class="form-input px-3 py-3 text-sm flex-1 font-bold" placeholder="Ingresa tu cédula" />
       <button onclick="buscarMisBoletos()" class="btn-primary px-5 py-3 text-xs font-black">Buscar</button>
     </div>
     <div id="verifyResults" class="mb-4 max-h-[40vh] overflow-y-auto"></div>
@@ -341,25 +370,57 @@
 <div id="payModal" class="modal-overlay" style="display:none">
   <div class="modal-sheet p-6">
     <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
-    <h2 class="text-xl font-black text-gray-900 mb-4">Completar Solicitud ðŸŽŸï¸</h2>
+    <h2 class="text-xl font-black text-gray-900 mb-4">Completar Solicitud 🎟️</h2>
     
     <div id="checkoutFormContainer">
+
+      <!-- DATOS DE PAGO MÓVIL OFICIAL — visibles arriba del formulario para
+           que el cliente pague primero y luego reporte los datos abajo. -->
+      <div class="pago-movil-box p-4 mb-5">
+        <div class="text-xs font-black text-rose-500 mb-3 tracking-wider uppercase flex items-center gap-1.5">
+          💳 Datos de Pago Móvil Oficial
+        </div>
+        <div class="space-y-2.5 text-sm text-gray-700 font-bold">
+          <div class="pago-movil-row flex justify-between items-center p-3">
+            <span class="text-gray-400 text-xs">Banco:</span>
+            <span class="text-gray-800 flex items-center gap-2">
+              BNC 0191
+              <button type="button" class="copy-icon-btn" onclick="copiarPagoMovil(this, '0191')" aria-label="Copiar código de banco">📋</button>
+            </span>
+          </div>
+          <div class="pago-movil-row flex justify-between items-center p-3">
+            <span class="text-gray-400 text-xs">C.I:</span>
+            <span class="text-gray-800 flex items-center gap-2">
+              19479080
+              <button type="button" class="copy-icon-btn" onclick="copiarPagoMovil(this, '19479080')" aria-label="Copiar cédula">📋</button>
+            </span>
+          </div>
+          <div class="pago-movil-row flex justify-between items-center p-3">
+            <span class="text-gray-400 text-xs">Teléfono:</span>
+            <span class="text-gray-800 flex items-center gap-2">
+              04269395786
+              <button type="button" class="copy-icon-btn" onclick="copiarPagoMovil(this, '04269395786')" aria-label="Copiar teléfono">📋</button>
+            </span>
+          </div>
+        </div>
+      </div>
+
       <form id="paymentForm" onsubmit="submitOrder(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-bold text-gray-500 mb-1">Nombre Completo</label>
-          <input type="text" id="payNombre" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: Juan PÃ©rez" />
+          <input type="text" id="payNombre" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: Juan Pérez" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">NÃºmero de CÃ©dula</label>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Número de Cédula</label>
           <input type="text" id="payCedula" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 12345678" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">NÃºmero de WhatsApp</label>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Número de WhatsApp</label>
           <input type="tel" id="payWhatsapp" required class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 04141234567" />
-          <p class="text-[10px] text-rose-500 mt-1 font-bold">âš ï¸ Obligatorio: Debe ser un nÃºmero con WhatsApp activo.</p>
+          <p class="text-[10px] text-rose-500 mt-1 font-bold">⚠️ Obligatorio: Debe ser un número con WhatsApp activo.</p>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-500 mb-1">Ãšltimos 6 dÃ­gitos del comprobante</label>
+          <label class="block text-xs font-bold text-gray-500 mb-1">Últimos 6 dígitos del comprobante</label>
           <input type="text" id="payReferencia" required maxlength="6" class="form-input w-full px-4 py-3 text-sm font-bold text-gray-800" placeholder="Ej: 123456" />
         </div>
         <div>
@@ -369,12 +430,12 @@
           </div>
         </div>
         <button type="submit" class="w-full bg-emerald-500 text-white font-black py-4 rounded-xl text-sm tracking-wide shadow-md hover:bg-emerald-600 transition-colors mt-2">
-          âœ… Confirmar Boleto y Pago
+          ✅ Confirmar Boleto y Pago
         </button>
       </form>
     </div>
 
-    <button onclick="document.getElementById('payModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold mt-3">Volver a Modificar NÃºmeros</button>
+    <button onclick="document.getElementById('payModal').style.display='none'" class="btn-outline w-full py-3 text-xs font-bold mt-3">Volver a Modificar Números</button>
   </div>
 </div>
 
@@ -382,10 +443,10 @@
 <script src="config.js?v=2"></script>
 <script src="app.js?v=4"></script>
 <script>
-  // cantidadAzar ya estÃ¡ declarada como variable global en app.js (let cantidadAzar = MINIMO_BOLETOS;).
-  // Declararla de nuevo aquÃ­ con "let" provocaba un SyntaxError real (variable duplicada en el mismo
-  // scope global), que descartaba TODO este bloque de script â€” por eso openPremiosModal/triggerLightboxView
-  // y la carga de premios desde Supabase dejaban de funcionar en esta pÃ¡gina.
+  // cantidadAzar ya está declarada como variable global en app.js (let cantidadAzar = MINIMO_BOLETOS;).
+  // Declararla de nuevo aquí con "let" provocaba un SyntaxError real (variable duplicada en el mismo
+  // scope global), que descartaba TODO este bloque de script — por eso openPremiosModal/triggerLightboxView
+  // y la carga de premios desde Supabase dejaban de funcionar en esta página.
   function ajustarAzar(val) {
     cantidadAzar = Math.max(1, cantidadAzar + val);
     document.getElementById('displayCantidadAzar').textContent = cantidadAzar;
@@ -432,12 +493,30 @@
 
   function openVerifyModal() { document.getElementById('verifyModal').style.display = 'flex'; }
 
-  // Carga SÃ­ncrona DinÃ¡mica desde Base de Datos (Supabase)
+  // Copia un dato de Pago Móvil (banco / cédula / teléfono) y da feedback
+  // visual inmediato: el ícono 📋 se convierte en ✅ durante 1.2s.
+  // Reutiliza showToast() (definida en app.js) para el aviso emergente.
+  function copiarPagoMovil(btnEl, texto) {
+    navigator.clipboard.writeText(texto).then(() => {
+      const original = btnEl.textContent;
+      btnEl.textContent = '✅';
+      btnEl.classList.add('copied');
+      btnEl.disabled = true;
+      showToast('✅ Copiado: ' + texto, 1500);
+      setTimeout(() => {
+        btnEl.textContent = original;
+        btnEl.classList.remove('copied');
+        btnEl.disabled = false;
+      }, 1200);
+    }).catch(() => showToast('⚠️ No se pudo copiar, hazlo manualmente.', 2000));
+  }
+
+  // Carga Síncrona Dinámica desde Base de Datos (Supabase)
   document.addEventListener('DOMContentLoaded', async () => {
     try {
-      // Reutilizamos la MISMA peticiÃ³n que ya disparÃ³ app.js (window.rifaConfigPromise)
-      // en vez de volver a consultar landing_config aquÃ­. Antes esta pÃ¡gina hacÃ­a
-      // DOS peticiones idÃ©nticas a Supabase en cada carga.
+      // Reutilizamos la MISMA petición que ya disparó app.js (window.rifaConfigPromise)
+      // en vez de volver a consultar landing_config aquí. Antes esta página hacía
+      // DOS peticiones idénticas a Supabase en cada carga.
       const { data: config } = await window.rifaConfigPromise;
       const flyerImg = document.getElementById('activeFlyerImg');
       if(config) {
@@ -445,7 +524,7 @@
           flyerImg.src = config.flyer_url;
         }
         
-        // Carga la informaciÃ³n de los premios si existe en la base de datos
+        // Carga la información de los premios si existe en la base de datos
         if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
         if(config.premio1_img) document.getElementById('imgPremio1').src = config.premio1_img;
         
@@ -454,7 +533,7 @@
       }
       if (flyerImg) flyerImg.classList.remove('img-skeleton');
     } catch(e) {
-      console.error("Error cargando configuraciÃ³n inicial:", e);
+      console.error("Error cargando configuración inicial:", e);
       const flyerImg = document.getElementById('activeFlyerImg');
       if (flyerImg) flyerImg.classList.remove('img-skeleton');
     }
