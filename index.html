@@ -109,8 +109,6 @@
       justify-content: center;
       padding: 16px;
     }
-    .copy-icon { color: var(--rose); font-size: 13px; cursor: pointer; }
-
     /* SKELETON / SHIMMER — reemplaza la sensación de "congelado" mientras
        cargan datos reales, usando la misma paleta rosa del resto del sitio. */
     @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
@@ -186,27 +184,11 @@
     </div>
   </div>
 
-  <!-- SECCIÓN: DATOS DE PAGO MÓVIL SÍNCRONOS -->
-  <div class="px-6 max-w-md mx-auto w-full">
-    <div class="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm border-t-4 border-t-rose-400">
-      <div class="text-xs font-black text-rose-500 mb-4 tracking-wider uppercase flex items-center gap-1.5">
-        💳 Datos de Pago Móvil Oficial
-      </div>
-      <div class="space-y-3 text-sm text-gray-700 font-bold">
-        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
-          <span class="text-gray-400 text-xs">Banco:</span>
-          <span class="text-gray-800">BNC 0191 <span class="copy-icon ml-1" onclick="copyData('0191')">📋</span></span>
-        </div>
-        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
-          <span class="text-gray-400 text-xs">C.I:</span>
-          <span class="text-gray-800">19479080 <span class="copy-icon ml-1" onclick="copyData('19479080')">📋</span></span>
-        </div>
-        <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100">
-          <span class="text-gray-400 text-xs">Teléfono:</span>
-          <span class="text-gray-800">04269395786 <span class="copy-icon ml-1" onclick="copyData('04269395786')">📋</span></span>
-        </div>
-      </div>
-    </div>
+  <!-- ESPACIO PUBLICITARIO (ADSTERRA) — Los datos de Pago Móvil se movieron
+       al modal "Confirmar Boleto y Pago" en rifas.html. Este contenedor
+       queda reservado para insertar aquí el script/tag de anuncios. -->
+  <div id="ad-slot-adsterra" class="px-6 max-w-md mx-auto w-full min-h-[1px]" aria-hidden="true">
+    <!-- TODO: pegar aquí el código de invocación del banner de Adsterra -->
   </div>
 
 </div>
@@ -300,11 +282,6 @@
 
   function handleOutsideLightboxClick(e) {
     closeLightboxView();
-  }
-
-  function copyData(textToCopy) {
-    navigator.clipboard.writeText(textToCopy);
-    alert("Copiado con éxito: " + textToCopy);
   }
 
   // ==========================================
