@@ -7,14 +7,12 @@ let PRECIO_BOLETO      = 5;
 let MINIMO_BOLETOS     = 2; // El mínimo por defecto, el admin puede cambiarlo en Supabase
 const TOTAL_BOLETOS    = 100;  
 const BOLETOS_POR_PAGINA = 100; // Todo en una sola vista
-let VIP_URL = 'https://chat.whatsapp.com/CT7Vkzgt81ZCrXsdbLLp3T?mode=gi_t';
 
 let ticketStates    = new Map();
 let availableList   = [];
 let currentPage     = 1;
 let totalPages      = 1; 
 let selectedTickets = new Set();
-let cdInterval      = null;
 let cantidadAzar    = MINIMO_BOLETOS;
 
 // ==========================================
@@ -104,7 +102,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         MINIMO_BOLETOS = parseInt(configData.minimo_boletos, 10);
         cantidadAzar = MINIMO_BOLETOS; 
       }
-      if (configData.enlace_vip) VIP_URL = configData.enlace_vip;
     }
   } catch (e) { console.error('Error leyendo configuración de Supabase', e); }
 
@@ -481,7 +478,34 @@ async function submitOrder(e) {
     }));
     
     const { error: ticketsError } = await db.from('tickets').insert(ticketsToInsert);
-    if (ticketsError) throw ticketsError;
+    if (ticketsError) {
+      // Código 23505 = violación de índice único en Postgres. Esto pasa
+      // cuando OTRA persona reservó/compró uno de estos números en el
+      // mismo instante (carrera entre dos compradores). Depende de que
+      // exista el índice único en la tabla tickets:
+      //   create unique index tickets_numero_activo on tickets (numero)
+      //   where estado in ('pendiente','vendido');
+      if (ticketsError.code === '23505') {
+        // El pedido en la tabla "pedidos" ya se creó pero quedó huérfano
+        // (sin tickets válidos detrás) porque el número ya no estaba
+        // disponible: lo deshacemos para no dejar basura ni cobrar por
+        // un número que no se pudo reservar.
+        await db.from('pedidos').delete().eq('id', pedidoData.id);
+
+        // Intentamos rescatar el número exacto que chocó del mensaje de
+        // Postgres (ej: "Key (numero)=(4) already exists."), si no,
+        // avisamos de forma genérica.
+        const match = /\(numero\)=\((\d+)\)/.exec(ticketsError.details || ticketsError.message || '');
+        const numeroOcupado = match ? match[1].padStart(2, '0') : null;
+
+        throw Object.assign(new Error(
+          numeroOcupado
+            ? `El número ${numeroOcupado} ya fue comprado por otra persona justo ahora.`
+            : 'Uno de los números que elegiste ya fue comprado por otra persona.'
+        ), { code: 'NUMERO_OCUPADO' });
+      }
+      throw ticketsError;
+    }
 
     // 4. Limpiar lista local
     boletosArray.forEach(n => {
@@ -511,21 +535,34 @@ async function submitOrder(e) {
     if (successModal) {
       successModal.style.display = 'flex';
     } else {
-      // rifas.html todavía no tiene el modal de éxito con el conteo VIP:
-      // mostramos un toast para que quede claro que SÍ se registró la compra.
-      showToast('✅ ¡Compra registrada! Te contactaremos por WhatsApp para confirmar.', 4000);
+      // Ya no redirigimos a ningún WhatsApp VIP: solo confirmamos que la
+      // compra quedó registrada y que la revisaremos pronto.
+      showToast('✅ ¡Compra registrada! Tu pago está siendo procesado, te informaremos en breve.', 4000);
     }
-    
-    startVIPCountdown();
     
   } catch(error) {
     console.error(error);
-    // Antes esto mostraba un mensaje genérico y el error real solo quedaba
-    // en la consola (que nadie revisa en el celular). Ahora mostramos el
-    // motivo exacto que devuelve Supabase (ej: política RLS, columna que
-    // no existe, etc.) para poder diagnosticar sin herramientas de desarrollador.
-    const detalle = error?.message || 'Error desconocido';
-    showToast(`❌ No se pudo registrar: ${detalle}`, 7000);
+
+    if (error.code === 'NUMERO_OCUPADO') {
+      // Pago rechazado: alguien más se adelantó comprando el mismo número.
+      // Limpiamos la selección y refrescamos el grid desde Supabase para
+      // que el número ocupado desaparezca de inmediato de "disponibles".
+      showToast(`❌ Pago rechazado: ${error.message} Elige otro número e inténtalo de nuevo.`, 7000);
+      closePayModal();
+      selectedTickets.clear();
+      RifaCache.clear('tickets_estado');
+      await loadTickets();
+      renderGrid();
+      updateUI();
+    } else {
+      // Antes esto mostraba un mensaje genérico y el error real solo quedaba
+      // en la consola (que nadie revisa en el celular). Ahora mostramos el
+      // motivo exacto que devuelve Supabase (ej: política RLS, columna que
+      // no existe, etc.) para poder diagnosticar sin herramientas de desarrollador.
+      const detalle = error?.message || 'Error desconocido';
+      showToast(`❌ No se pudo registrar: ${detalle}`, 7000);
+    }
+
     if (btn) { btn.disabled = false; btn.innerHTML = '✅ Confirmar Boleto y Pago'; }
   }
 }
@@ -625,32 +662,6 @@ function showToast(msg, duration = 2000) {
   
   document.body.appendChild(t); 
   setTimeout(() => t.remove(), duration);
-}
-
-function startVIPCountdown() {
-  let c = 3; 
-  let cdNum = document.getElementById('cdNum'); 
-  if(cdNum) cdNum.textContent = c;
-  
-  let cdRing = document.getElementById('cdRing'); 
-  if(cdRing) cdRing.style.setProperty('--pct', '100%');
-  
-  if (cdInterval) clearInterval(cdInterval);
-  
-  cdInterval = setInterval(() => {
-    c--; 
-    if(cdNum) cdNum.textContent = c; 
-    if(cdRing) cdRing.style.setProperty('--pct', (c/3)*100 + '%');
-    
-    if (c <= 0) { 
-      clearInterval(cdInterval); 
-      goVIP(); 
-    }
-  }, 1000);
-}
-
-function goVIP() { 
-  window.location.href = VIP_URL; 
 }
 
 function closeSuccessModal() { 
