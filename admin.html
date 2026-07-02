@@ -319,7 +319,7 @@
     <div class="px-4 py-3 flex gap-2 overflow-x-auto">
       <button class="tab-btn active" onclick="filterPedidos('todos',this)">Todos</button>
       <button class="tab-btn" onclick="filterPedidos('pendiente',this)">⏳ Esperando</button>
-      <button class="tab-btn" onclick="filterPedidos('approved',this)">✅ Listos</button>
+      <button class="tab-btn" onclick="filterPedidos('aprobado',this)">✅ Listos</button>
       <button class="tab-btn" onclick="filterPedidos('rechazado',this)">❌ Fuera</button>
     </div>
 
@@ -474,18 +474,57 @@ function renderPedidos(pedidos) {
 
       ${p.estado === 'pendiente' ? `
         <div class="flex gap-2 pt-1">
-          <button class="btn-approve flex-1 py-2.5 text-xs shadow-md shadow-emerald-100" onclick="approveOrder('${p.id}')">Aprobar Pago</button>
-          <button class="btn-reject flex-1 py-2.5 text-xs shadow-md shadow-rose-100" onclick="rejectOrder('${p.id}')">Rechazar / Liberar</button>
-        </div>` : `
-        <div class="text-xs font-bold text-center p-1.5 rounded-lg bg-gray-50 text-gray-500">
-          ${p.estado === 'aprobado' ? '✅ Boleto Adjudicado y Fijo' : '❌ Transacción Descartada'}
-        </div>`}
+          <button class="btn-approve flex-1 py-2.5 text-xs shadow-md shadow-emerald-100" onclick="approveOrder('${p.id}')">✅ Aprobar Pago</button>
+          <button class="btn-reject flex-1 py-2.5 text-xs shadow-md shadow-rose-100"    onclick="rejectOrder('${p.id}')">❌ Rechazar / Liberar</button>
+        </div>
+      ` : p.estado === 'aprobado' ? `
+        <div class="space-y-2 pt-1">
+          <div class="text-xs font-bold text-center p-1.5 rounded-lg bg-emerald-50 text-emerald-700">✅ Boleto Adjudicado y Fijo</div>
+          <button class="btn-reject w-full py-2 text-xs shadow-md shadow-rose-100" onclick="revertOrder('${p.id}')">↩️ Revertir a Pendiente</button>
+        </div>
+      ` : `
+        <div class="space-y-2 pt-1">
+          <div class="text-xs font-bold text-center p-1.5 rounded-lg bg-rose-50 text-rose-700">❌ Transacción Descartada</div>
+          <button onclick="deleteRejected('${p.id}')" style="width:100%;padding:8px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-weight:800;border:none;border-radius:10px;cursor:pointer;font-size:12px;">🗑️ Eliminar Registro</button>
+        </div>
+      `}
     </div>`;
   }).join('');
 }
 
 function getBadgeLabel(e) {
   return { pendiente:'⏳ Pendiente', aprobado:'✅ Aprobado', rechazado:'❌ Rechazado' }[e] || e;
+}
+
+// Elimina definitivamente un pedido rechazado (limpieza manual)
+async function deleteRejected(pedidoId) {
+  if (!confirm('¿Eliminar este registro rechazado permanentemente? Esta acción no se puede deshacer.')) return;
+  try {
+    // Los tickets ya fueron liberados al rechazar; solo borramos el pedido huérfano
+    const { error } = await db.from('pedidos').delete().eq('id', pedidoId);
+    if (error) throw error;
+    showToast('🗑️ Registro eliminado correctamente', 2000);
+    await loadPedidos();
+  } catch(err) {
+    console.error('deleteRejected error:', err);
+    showToast('❌ Error al eliminar: ' + (err.message || 'ver consola'), 3500);
+  }
+}
+
+// Regresa un pedido aprobado a "pendiente" para revisión manual
+async function revertOrder(pedidoId) {
+  if (!confirm('¿Revertir este pago a PENDIENTE? Los boletos volverán a estado reservado.')) return;
+  try {
+    const { error: e1 } = await db.from('pedidos').update({ estado: 'pendiente' }).eq('id', pedidoId);
+    if (e1) throw e1;
+    const { error: e2 } = await db.from('tickets').update({ estado: 'reservado' }).eq('pedido_id', pedidoId);
+    if (e2) throw e2;
+    showToast('↩️ Pedido revertido a pendiente', 2000);
+    await loadPedidos();
+  } catch(err) {
+    console.error('revertOrder error:', err);
+    showToast('❌ Error al revertir: ' + (err.message || 'ver consola'), 3500);
+  }
 }
 
 async function approveOrder(pedidoId) {
@@ -783,15 +822,20 @@ async function formatearSistemaCompleto() {
 
   showToast('☢️ Vaciando tablas remotas del servidor...', 6000);
   try {
-    await db.from('historial_rifas').delete().not('id', 'is', null);
-    await db.from('tickets').delete().gte('numero', 0);
-    await db.from('pedidos').delete().not('id', 'is', null);
+    const { error: errH } = await db.from('historial_rifas').delete().not('id', 'is', null);
+    if (errH) throw new Error('historial_rifas: ' + errH.message);
+
+    const { error: errT } = await db.from('tickets').delete().gte('numero', 0);
+    if (errT) throw new Error('tickets: ' + errT.message);
+
+    const { error: errP } = await db.from('pedidos').delete().not('id', 'is', null);
+    if (errP) throw new Error('pedidos: ' + errP.message);
 
     alert('✅ Servidor en cero absoluto. Sistema reiniciado con éxito.');
     location.reload();
   } catch(err) {
-    console.error(err);
-    alert('❌ Falla crítica de borrado en Supabase.');
+    console.error('Nuclear error:', err);
+    alert('❌ Falla crítica de borrado en Supabase.\n\nDetalle: ' + err.message + '\n\n⚠️ Revisa las políticas RLS de la tabla indicada en Supabase Dashboard → Authentication → Policies y asegúrate de tener una política DELETE activa.');
   }
 }
 
