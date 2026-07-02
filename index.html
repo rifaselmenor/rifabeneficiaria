@@ -110,6 +110,15 @@
       padding: 16px;
     }
     .copy-icon { color: var(--rose); font-size: 13px; cursor: pointer; }
+
+    /* SKELETON / SHIMMER — reemplaza la sensación de "congelado" mientras
+       cargan datos reales, usando la misma paleta rosa del resto del sitio. */
+    @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+    .img-skeleton {
+      background: linear-gradient(90deg, #FFF1F2 25%, #FFE4E6 37%, #FFF1F2 63%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
   </style>
 </head>
 <body>
@@ -140,7 +149,7 @@
 
   <!-- SECCIÓN FLYER PRINCIPAL (ASPECT RATIO DE TU DISEÑO) -->
   <div class="relative w-full bg-gray-50 border-b border-gray-100 shadow-sm">
-    <img id="landingFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando+Sorteo..." class="w-full aspect-[4/5] object-cover" alt="Sorteo Ana">
+    <img id="landingFlyerImg" src="https://via.placeholder.com/600x800?text=Cargando+Sorteo..." class="w-full aspect-[4/5] object-cover img-skeleton" alt="Sorteo Ana" fetchpriority="high" decoding="async" loading="eager" width="600" height="750">
     <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent flex flex-col justify-end p-6">
       <div class="flex items-center gap-2 mb-1">
         <span class="bg-rose-500 rounded-full w-2.5 h-2.5 animate-pulse"></span>
@@ -219,7 +228,7 @@
       <div class="bg-rose-50/50 border border-rose-100/70 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio1')">
         <div class="flex gap-4 items-center">
           <div class="w-16 h-16 rounded-xl bg-white border border-rose-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-            <img id="imgPremio1" src="https://via.placeholder.com/300x400?text=Premio+1" class="w-full h-full object-cover" alt="Premio 1">
+            <img id="imgPremio1" src="https://via.placeholder.com/300x400?text=Premio+1" class="w-full h-full object-cover" alt="Premio 1" loading="lazy" decoding="async">
           </div>
           <div class="flex-1">
             <h3 class="font-black text-gray-900 text-base">Primer Premio</h3>
@@ -232,7 +241,7 @@
       <div class="bg-gray-50 border border-gray-200/60 rounded-2xl p-4 cursor-pointer transition active:scale-95" onclick="triggerLightboxView('imgPremio2')">
         <div class="flex gap-4 items-center">
           <div class="w-16 h-16 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-            <img id="imgPremio2" src="https://via.placeholder.com/300x400?text=Premio+2" class="w-full h-full object-cover" alt="Premio 2">
+            <img id="imgPremio2" src="https://via.placeholder.com/300x400?text=Premio+2" class="w-full h-full object-cover" alt="Premio 2" loading="lazy" decoding="async">
           </div>
           <div class="flex-1">
             <h3 class="font-black text-gray-900 text-sm">Segundo Premio</h3>
@@ -298,34 +307,76 @@
     alert("Copiado con éxito: " + textToCopy);
   }
 
+  // ==========================================
+  // CAPA DE CACHÉ LIGERA (mismo formato que RifaCache en app.js, así que
+  // si el visitante pasa de esta página a rifas.html dentro de los 5
+  // minutos, esa página reutiliza este mismo dato sin volver a pedirlo).
+  // ==========================================
+  const RifaCache = {
+    get(key, ttlMs) {
+      try {
+        const raw = sessionStorage.getItem('rifa_cache_' + key);
+        if (!raw) return null;
+        const { t, v } = JSON.parse(raw);
+        if (Date.now() - t > ttlMs) return null;
+        return v;
+      } catch (e) { return null; }
+    },
+    set(key, value) {
+      try { sessionStorage.setItem('rifa_cache_' + key, JSON.stringify({ t: Date.now(), v: value })); }
+      catch (e) {}
+    }
+  };
+  const CACHE_TTL_CONFIG  = 5 * 60 * 1000; // 5 minutos
+  const CACHE_TTL_TICKETS = 15 * 1000;     // 15 segundos
+
+  function aplicarConfig(config) {
+    if (!config) return;
+    const flyerImg = document.getElementById('landingFlyerImg');
+    if (config.flyer_url && flyerImg) flyerImg.src = config.flyer_url;
+    if (flyerImg) flyerImg.classList.remove('img-skeleton');
+    if (config.mensaje) document.getElementById('landingMsgText').textContent = config.mensaje;
+
+    if (config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
+    if (config.premio1_img) document.getElementById('imgPremio1').src = config.premio1_img;
+
+    if (config.premio2_desc) document.getElementById('descPremio2').textContent = config.premio2_desc;
+    if (config.premio2_img) document.getElementById('imgPremio2').src = config.premio2_img;
+  }
+
+  function aplicarProgreso(tkts) {
+    if (!tkts) return;
+    const reservados = tkts.filter(t => t.estado === 'vendido' || t.estado === 'pendiente').length;
+    const porcentajeVenta = Math.min(100, Math.round((reservados / 100) * 100));
+    document.getElementById('salesPct').textContent = porcentajeVenta + '%';
+    document.getElementById('salesFill').style.width = porcentajeVenta + '%';
+  }
+
   // Carga Síncrona Dinámica desde Base de Datos (Supabase)
   document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      // Consulta tabla de configuraciones del landing
-      const { data: config } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
-      if(config) {
-        if(config.flyer_url) document.getElementById('landingFlyerImg').src = config.flyer_url;
-        if(config.mensaje) document.getElementById('landingMsgText').textContent = config.mensaje;
-        
-        // Mapeo dinámico de URLs del bucket e información de texto
-        if(config.premio1_desc) document.getElementById('descPremio1').textContent = config.premio1_desc;
-        if(config.premio1_img) document.getElementById('imgPremio1').src = config.premio1_img;
-        
-        if(config.premio2_desc) document.getElementById('descPremio2').textContent = config.premio2_desc;
-        if(config.premio2_img) document.getElementById('imgPremio2').src = config.premio2_img;
-      }
+    // 1) Pintado instantáneo: si hay algo en caché reciente, se muestra
+    //    de inmediato (sin esperar la red) para que nunca se sienta vacío.
+    const cachedConfig = RifaCache.get('landing_config', CACHE_TTL_CONFIG);
+    if (cachedConfig) aplicarConfig(cachedConfig);
+    const cachedTkts = RifaCache.get('tickets_estado_landing', CACHE_TTL_TICKETS);
+    if (cachedTkts) aplicarProgreso(cachedTkts);
 
-      // Cálculo en tiempo real de la barra de progreso (misma tabla/columna que usan app.js y admin.html)
+    // 2) Refresco real contra Supabase (siempre corre, para no mostrar datos viejos)
+    try {
+      const { data: config, error: configError } = await db.from('landing_config').select('*').eq('id','main').maybeSingle();
+      if (configError) console.error('Error consultando landing_config:', configError);
+      if (config) { RifaCache.set('landing_config', config); aplicarConfig(config); }
+
       const { data: tkts, error: tktsError } = await db.from('tickets').select('estado');
-      if(tktsError) console.error('Error consultando tickets:', tktsError);
-      if(tkts) {
-        const reservados = tkts.filter(t => t.estado === 'vendido' || t.estado === 'pendiente').length;
-        const porcentajeVenta = Math.min(100, Math.round((reservados / 100) * 100));
-        document.getElementById('salesPct').textContent = porcentajeVenta + '%';
-        document.getElementById('salesFill').style.width = porcentajeVenta + '%';
-      }
+      if (tktsError) console.error('Error consultando tickets:', tktsError);
+      if (tkts) { RifaCache.set('tickets_estado_landing', tkts); aplicarProgreso(tkts); }
     } catch(error) {
       console.error("Error cargando configuración inicial:", error);
+    } finally {
+      // Por si el flyer no vino en config (o falló la consulta), igual quitamos
+      // el shimmer para no dejarlo animando para siempre.
+      const flyerImg = document.getElementById('landingFlyerImg');
+      if (flyerImg) flyerImg.classList.remove('img-skeleton');
     }
   });
 </script>
