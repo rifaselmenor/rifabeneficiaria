@@ -18,11 +18,65 @@ let cdInterval      = null;
 let cantidadAzar    = MINIMO_BOLETOS;
 
 // ==========================================
+// 0. CAPA DE CACHÉ LIGERA PARA SUPABASE
+//    Evita repetir consultas idénticas mientras
+//    los datos siguen "frescos" (dentro del TTL).
+//    Se guarda en sessionStorage: sobrevive entre
+//    index.html -> rifas.html en la misma pestaña.
+// ==========================================
+const RifaCache = {
+  get(key, ttlMs) {
+    try {
+      const raw = sessionStorage.getItem('rifa_cache_' + key);
+      if (!raw) return null;
+      const { t, v } = JSON.parse(raw);
+      if (Date.now() - t > ttlMs) return null; // expiró
+      return v;
+    } catch (e) { return null; }
+  },
+  set(key, value) {
+    try {
+      sessionStorage.setItem('rifa_cache_' + key, JSON.stringify({ t: Date.now(), v: value }));
+    } catch (e) { /* sessionStorage lleno o bloqueado: seguimos sin caché */ }
+  },
+  clear(key) {
+    try { sessionStorage.removeItem('rifa_cache_' + key); } catch (e) {}
+  }
+};
+
+// TTLs: config cambia poco (la toca el admin) -> caché más larga.
+// Tickets cambian todo el tiempo (otros compradores) -> caché corta,
+// solo para absorber navegaciones rápidas entre páginas, no para
+// evitar ver ventas nuevas.
+const CACHE_TTL_CONFIG  = 5 * 60 * 1000; // 5 minutos
+const CACHE_TTL_TICKETS = 15 * 1000;     // 15 segundos
+
+// Trae landing_config usando caché. Si hay dato en caché lo devuelve
+// al instante (sin red); si no, consulta Supabase y guarda el resultado.
+async function getLandingConfigCached() {
+  const cached = RifaCache.get('landing_config', CACHE_TTL_CONFIG);
+  if (cached) return { data: cached, fromCache: true };
+  const { data, error } = await db.from('landing_config').select('*').eq('id', 'main').maybeSingle();
+  if (!error && data) RifaCache.set('landing_config', data);
+  return { data, fromCache: false, error };
+}
+
+// IMPORTANTE: disparamos la consulta AHORA MISMO, apenas se parsea este
+// script (no esperamos a DOMContentLoaded). Además la guardamos como UNA
+// sola promesa compartida en window.rifaConfigPromise: tanto este archivo
+// como el script inline de rifas.html/index.html deben usar esta misma
+// promesa (await window.rifaConfigPromise) en vez de volver a consultar
+// landing_config por su cuenta. Antes, app.js y el inline de rifas.html
+// pedían la MISMA fila dos veces en cada carga — esto lo deja en una sola.
+window.rifaConfigPromise = getLandingConfigCached();
+
+// ==========================================
 // 1. INICIALIZACIÓN AL CARGAR LA PÁGINA
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
+  renderSkeletonGrid(); // Pinta placeholders al instante para que nunca se sienta "congelado"
   try {
-    const { data: configData } = await db.from('landing_config').select('*').eq('id', 'main').single();
+    const { data: configData } = await window.rifaConfigPromise;
     if (configData) {
       // Bloqueo de plataforma si el admin pausó las ventas
       if (configData.ventas_activas === false) {
@@ -71,7 +125,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   configurarBotonesDinamicos();
-  showToast('⏳ Cargando boletos...');
   await loadTickets(); 
   renderGrid();
   updateUI();
@@ -104,37 +157,53 @@ function configurarBotonesDinamicos() {
 // ==========================================
 // 3. CARGA DE TICKETS (00 al 99)
 // ==========================================
-async function loadTickets() {
-  // Inicializamos los 100 boletos con formato de 2 dígitos (00, 01, ..., 99)
+
+// Aplica un snapshot de tickets (venido de caché o de Supabase) al estado
+// local y repinta. Separado en su propia función porque ahora se llama
+// hasta dos veces: una instantánea desde caché (si existe) y otra con el
+// dato fresco de la red.
+function aplicarTicketsData(data) {
+  for (let i = 0; i < TOTAL_BOLETOS; i++) {
+    ticketStates.set(i.toString().padStart(2, '0'), 'available');
+  }
+  (data || []).forEach(t => {
+    let numStr = t.numero.toString().padStart(2, '0');
+    ticketStates.set(numStr, t.estado);
+  });
+
+  availableList = [];
   for (let i = 0; i < TOTAL_BOLETOS; i++) {
     let numStr = i.toString().padStart(2, '0');
-    ticketStates.set(numStr, 'available');
+    if (ticketStates.get(numStr) !== 'pendiente' && ticketStates.get(numStr) !== 'vendido') {
+       availableList.push(numStr);
+    }
   }
-  
+  totalPages = 1;
+  updateSalesBar();
+  renderGrid();
+}
+
+async function loadTickets() {
+  // Fast-path: si hay un snapshot de hace menos de 15s, lo pintamos YA
+  // (sin esperar la red) y de todas formas refrescamos en segundo plano
+  // por si alguien más compró en ese ratito. Esto es lo que hace que el
+  // grid se sienta instantáneo al navegar entre páginas.
+  const cachedTickets = RifaCache.get('tickets_estado', CACHE_TTL_TICKETS);
+  if (cachedTickets) aplicarTicketsData(cachedTickets);
+
   try {
     // Pedimos a la BD un límite alto (1000) por seguridad para garantizar traer los 100
     const { data, error } = await db.from('tickets').select('numero,estado').in('estado', ['pendiente','vendido']).range(0, 1000);
     if (error) throw error;
-    
-    if (data && data.length > 0) {
-      data.forEach(t => {
-        let numStr = t.numero.toString().padStart(2, '0');
-        ticketStates.set(numStr, t.estado);
-      });
-    }
-    
-    availableList = [];
-    for (let i = 0; i < TOTAL_BOLETOS; i++) {
-      let numStr = i.toString().padStart(2, '0');
-      if (ticketStates.get(numStr) !== 'pendiente' && ticketStates.get(numStr) !== 'vendido') {
-         availableList.push(numStr);
-      }
-    }
-    totalPages = 1;
-    updateSalesBar();
+    RifaCache.set('tickets_estado', data || []);
+    aplicarTicketsData(data || []);
   } catch(e) { 
-    console.error("Error cargando tickets de Supabase", e); 
-    showToast("Error de conexión al cargar números");
+    if (!cachedTickets) {
+      console.error("Error cargando tickets de Supabase", e); 
+      showToast("Error de conexión al cargar números");
+      renderGrid(); // saca el skeleton aunque haya fallado, para no dejar la rueda girando
+    }
+    // Si ya había caché, nos quedamos mostrando ese snapshot en vez de romper la UI.
   }
 }
 
@@ -158,22 +227,52 @@ function updateSalesBar() {
   if (disp) disp.textContent = availableList.length;
 }
 
+// Skeleton de carga: pinta placeholders al instante (sin esperar Supabase)
+// para que la pantalla nunca se sienta vacía/congelada mientras llegan los datos.
+function renderSkeletonGrid() {
+  const grid = document.getElementById('ticketGrid');
+  if (!grid) return;
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 20; i++) {
+    const s = document.createElement('div');
+    s.className = 'ticket-skeleton';
+    frag.appendChild(s);
+  }
+  grid.innerHTML = '';
+  grid.appendChild(frag);
+}
+
+let gridDelegationBound = false;
+
 function renderGrid() {
   const grid = document.getElementById('ticketGrid');
   if (!grid) return;
-  grid.innerHTML = '';
-  
-  // Como es de 100, pintamos directo la lista completa, sin paginador real.
-  // Pero necesitamos renderizar todos los números (00 al 99) y pintar los que no estén en availableList como ocupados si queremos mostrarlos,
-  // O como lo solicitaste: solo pintamos availableList o pintamos la cuadricula entera.
-  // Tu código original de la IA anterior pintaba SOLO los disponibles. Mantengo tu lógica exacta:
+
+  // Construimos todos los nodos en un DocumentFragment (memoria, sin tocar
+  // el DOM real) y los insertamos de una sola vez -> un solo reflow en vez
+  // de 100. Antes cada iteración hacía grid.appendChild(t) directo al DOM.
+  const frag = document.createDocumentFragment();
   for (let i = 0; i < availableList.length; i++) {
     let numStr = availableList[i];
     let t = document.createElement('div');
     t.className = 'ticket ' + (selectedTickets.has(numStr) ? 'ticket-selected' : 'ticket-available');
     t.textContent = numStr;
-    t.onclick = () => toggleTicket(numStr);
-    grid.appendChild(t);
+    t.dataset.num = numStr;
+    frag.appendChild(t);
+  }
+  grid.innerHTML = '';
+  grid.appendChild(frag);
+
+  // Delegación de eventos: UN solo listener en el contenedor en vez de 100
+  // closures individuales (uno por número). Se registra una sola vez y
+  // sigue funcionando aunque el grid se repinte, porque escucha en el
+  // padre, no en cada ticket.
+  if (!gridDelegationBound) {
+    grid.addEventListener('click', (e) => {
+      const el = e.target.closest('.ticket');
+      if (el && el.dataset.num) toggleTicket(el.dataset.num);
+    });
+    gridDelegationBound = true;
   }
 }
 
@@ -183,7 +282,14 @@ function toggleTicket(numStr) {
   } else {
     selectedTickets.add(numStr);
   }
-  renderGrid(); 
+  // Antes: cada clic reconstruía los 100 nodos del grid entero.
+  // Ahora: solo actualizamos la clase del ticket que cambió -> el clic
+  // se siente instantáneo incluso en equipos de gama baja.
+  const grid = document.getElementById('ticketGrid');
+  const el = grid && grid.querySelector('.ticket[data-num="' + numStr + '"]');
+  if (el) {
+    el.className = 'ticket ' + (selectedTickets.has(numStr) ? 'ticket-selected' : 'ticket-available');
+  }
   updateUI();
 }
 
@@ -251,9 +357,15 @@ function updateUI() {
 function openPayModal() {
   if (selectedTickets.size < MINIMO_BOLETOS) return;
   const termsAgreed = localStorage.getItem('termsAgreed');
-  if (!termsAgreed) { 
-    document.getElementById('termsModal').style.display = 'flex'; 
-    return; 
+  const termsModalEl = document.getElementById('termsModal');
+  // Antes: si no existía #termsModal en la página, esta línea lanzaba un
+  // error no capturado y el modal de pago NUNCA llegaba a abrirse (se
+  // sentía "congelado" en el primer intento de compra). Ahora, si el
+  // modal de términos no está presente en el HTML, simplemente lo
+  // saltamos en vez de romper el flujo.
+  if (!termsAgreed && termsModalEl) {
+    termsModalEl.style.display = 'flex';
+    return;
   }
   let container = document.getElementById('selectedChips');
   if(container) {
@@ -268,16 +380,22 @@ function openPayModal() {
   let total = selectedTickets.size * PRECIO_BOLETO;
   let mTotal = document.getElementById('modalTotal');
   if(mTotal) mTotal.textContent = `Bs. ${total}`;
-  document.getElementById('payModal').style.display = 'flex';
+
+  // Refleja los boletos elegidos y el total dentro del propio formulario
+  // de pago (rifas.html), que no usa chips separados sino el modal actual.
+  const payModalEl = document.getElementById('payModal');
+  if (payModalEl) payModalEl.style.display = 'flex';
 }
 
 function closePayModal() { 
-  document.getElementById('payModal').style.display = 'none'; 
+  const el = document.getElementById('payModal');
+  if (el) el.style.display = 'none'; 
 }
 
 function acceptTerms() {
   localStorage.setItem('termsAgreed', 'true');
-  document.getElementById('termsModal').style.display = 'none';
+  const el = document.getElementById('termsModal');
+  if (el) el.style.display = 'none';
   openPayModal();
 }
 
@@ -306,22 +424,30 @@ function previewCapture(input) {
 // ==========================================
 async function submitOrder(e) {
   e.preventDefault();
+  // Todo el cuerpo de la función va dentro del try: antes, la lectura de
+  // los campos del formulario ocurría FUERA del try/catch, así que si un
+  // solo getElementById fallaba (por ejemplo por un id que no coincidía
+  // con el HTML), la función se detenía con un error no capturado y el
+  // botón se quedaba trabado en "Procesando..." para siempre — eso era
+  // el "congelamiento" que estás viendo.
   const btn = e.target.querySelector('button[type="submit"]');
-  btn.disabled = true; 
-  btn.innerHTML = '⏳ Procesando...';
-  
-  const nombre = document.getElementById('fNombre').value;
-  const cedula = document.getElementById('fCedula').value;
-  const whatsapp = document.getElementById('fWhatsapp').value;
-  const totalPagado = selectedTickets.size * PRECIO_BOLETO;
-  const refEl = document.getElementById('fRef');
-  const referencia = refEl ? refEl.value : '000000';
-  const boletosArray = Array.from(selectedTickets).sort();
-  const boletosStr = boletosArray.join(', ');
-  const fileInput = document.getElementById('fCapture');
-  const file = fileInput ? fileInput.files[0] : null;
-
   try {
+    if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Procesando...'; }
+
+    // OJO: estos ids deben coincidir EXACTO con los del <input> en
+    // rifas.html. El formulario actual usa payNombre/payCedula/
+    // payWhatsapp/payReferencia/payComprobante (no fNombre/fCedula/...).
+    const nombre = document.getElementById('payNombre').value.trim();
+    const cedula = document.getElementById('payCedula').value.trim();
+    const whatsapp = document.getElementById('payWhatsapp').value.trim();
+    const totalPagado = selectedTickets.size * PRECIO_BOLETO;
+    const refEl = document.getElementById('payReferencia');
+    const referencia = refEl ? refEl.value.trim() : '000000';
+    const boletosArray = Array.from(selectedTickets).sort();
+    const boletosStr = boletosArray.join(', ');
+    const fileInput = document.getElementById('payComprobante');
+    const file = fileInput ? fileInput.files[0] : null;
+
     let captureUrl = null;
     
     // 1. Subir Capture a Supabase Storage
@@ -366,6 +492,9 @@ async function submitOrder(e) {
     
     updateSalesBar(); 
     renderGrid();
+    // Estos boletos ya no están disponibles: invalidamos la caché para que
+    // ninguna otra pestaña/página los siga mostrando como libres.
+    RifaCache.clear('tickets_estado');
     
     // 5. Notificar por Telegram
     try { 
@@ -373,21 +502,26 @@ async function submitOrder(e) {
     } catch (telErr) { console.warn("Error enviando Telegram, pero la compra se procesó"); }
     
     // 6. Cerrar modal y mostrar éxito
-    document.getElementById('payModal').style.display = 'none';
+    closePayModal();
     const summary = document.getElementById('successSummary');
     if(summary) {
         summary.innerHTML = `<div class="text-gray-800 font-bold">👤 ${nombre}</div><div class="text-gray-800">🎟️ ${selectedTickets.size} boletos</div><div class="text-gray-800">💰 Pagado: Bs. ${totalPagado}</div><div class="text-xs mt-1 text-gray-500">Ref: ${referencia}</div>`;
     }
     const successModal = document.getElementById('successModal');
-    if(successModal) successModal.style.display = 'flex';
+    if (successModal) {
+      successModal.style.display = 'flex';
+    } else {
+      // rifas.html todavía no tiene el modal de éxito con el conteo VIP:
+      // mostramos un toast para que quede claro que SÍ se registró la compra.
+      showToast('✅ ¡Compra registrada! Te contactaremos por WhatsApp para confirmar.', 4000);
+    }
     
     startVIPCountdown();
     
   } catch(error) {
     console.error(error);
-    showToast('❌ Compra detenida. Revisa tu conexión.');
-    btn.disabled = false; 
-    btn.innerHTML = '🚀 Confirmar y Reservar';
+    showToast('❌ Compra detenida. Revisa tu conexión e inténtalo de nuevo.');
+    if (btn) { btn.disabled = false; btn.innerHTML = '✅ Confirmar Boleto y Pago'; }
   }
 }
 
@@ -515,7 +649,8 @@ function goVIP() {
 }
 
 function closeSuccessModal() { 
-  document.getElementById('successModal').style.display = 'none'; 
+  const el = document.getElementById('successModal');
+  if (el) el.style.display = 'none'; 
   window.location.reload(); 
 }
 
