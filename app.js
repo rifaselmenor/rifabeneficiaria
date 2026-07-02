@@ -520,7 +520,12 @@ async function submitOrder(e) {
     
   } catch(error) {
     console.error(error);
-    showToast('❌ Compra detenida. Revisa tu conexión e inténtalo de nuevo.');
+    // Antes esto mostraba un mensaje genérico y el error real solo quedaba
+    // en la consola (que nadie revisa en el celular). Ahora mostramos el
+    // motivo exacto que devuelve Supabase (ej: política RLS, columna que
+    // no existe, etc.) para poder diagnosticar sin herramientas de desarrollador.
+    const detalle = error?.message || 'Error desconocido';
+    showToast(`❌ No se pudo registrar: ${detalle}`, 7000);
     if (btn) { btn.disabled = false; btn.innerHTML = '✅ Confirmar Boleto y Pago'; }
   }
 }
